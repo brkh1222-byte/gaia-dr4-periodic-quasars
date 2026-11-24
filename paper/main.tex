@@ -1,0 +1,154 @@
+% RNAAS research note, AASTeX. Draft written by Claude (AI) for the researcher to review
+% and edit. Results are placeholders until the pre-registered analysis has been run on
+% Gaia DR4 (released 2 Dec 2026). Word limit: 1500 words incl. title, captions, references.
+% NOTE: the class/option below must be checked against the current AASTeX release
+% (AASTeX v7 is preferred by the AAS; the RNAAS option is documented for v6.3.1).
+\documentclass[RNAAS]{aastex631}
+
+\usepackage{amsmath}
+
+% ---- numbers filled from the repository (update before submission) ----
+\newcommand{\Ncand}{[N\_CAND]}            % candidates in the scored samples
+\newcommand{\Ntest}{[N\_TESTABLE]}        % testable candidates
+\newcommand{\NG}{111}                     % Graham+2015
+\newcommand{\NC}{33}                      % Charisi+2016 final sample
+\newcommand{\NF}{257}                     % Foustoul+2025 (36 + 221)
+\newcommand{\prereghash}{[PREREG\_COMMIT\_HASH]}
+\newcommand{\codehash}{[ANALYSIS\_CODE\_HASH]}
+\newcommand{\pending}[1]{\textbf{[PENDING: #1]}}
+
+\begin{document}
+
+\title{A Pre-registered Test of Published Periodic-Quasar Ephemerides with Gaia DR4 Epoch Photometry}
+
+\author{[AUTHORS --- TBD]}
+
+\begin{abstract}
+Several hundred quasars have been proposed as sub-parsec supermassive black hole binaries
+because their optical light curves appear periodic over 1.5--3 cycles. Red-noise
+variability produces such apparent periods readily. We test whether the published periods
+of the CRTS \citep{Graham2015} and PTF \citep{Charisi2016} candidates, with phase and
+amplitude taken from the discovery data alone, predict Gaia DR4 G-band photometry
+obtained after each catalogue was published better than a damped random walk conditioned
+on the same data. The models, frozen parameters, scoring rule and decision thresholds were
+committed to a public repository before the DR4 release (commit \prereghash).
+\pending{headline result: H1 outcome, number of survivors, 95\% upper limit on the
+fraction of true periodic sources.}
+\end{abstract}
+
+\section{Introduction}
+
+Supermassive black hole binaries (SMBHBs) are expected after galaxy mergers and are the
+likely source of the nanohertz gravitational-wave background reported by pulsar timing
+arrays \citep{NANOGrav2023}. At sub-parsec separations their orbital periods are years,
+and accretion modulated by the binary, or relativistic Doppler boosting, could make the
+quasar light curve periodic. Searches of large time-domain surveys have produced hundreds
+of candidates \citep{Graham2015, Charisi2016, Liu2019, Chen2024, Foustoul2025}. Most show
+only 1.5--3 cycles, and stochastic quasar variability, well described by a damped random
+walk \citep[DRW;][]{Kelly2009}, produces apparent periods of this kind at a high rate
+\citep{Vaughan2016}. Extended baselines have removed most candidates
+\citep{Liu2016, Liu2019, Foustoul2025}, Gaia DR3 sinusoids failed to predict later ZTF
+data \citep{ElBadry2026}, and a blind search of Gaia DR3 AGN found no reliable periodic
+source \citep{Huijse2026}.
+
+The cleanest test of a claimed period is whether it predicts data that played no part in
+finding it. Gaia DR4 publishes epoch photometry for all sources from 2014 July 25 to 2020
+January 20, which fills the gap between CRTS (to $\sim$2013) and ZTF (from 2018). For the
+CRTS and PTF candidates, the DR4 epochs after each paper's submission are genuinely new.
+We fixed every prediction and decision rule before DR4 was released, so that the analysis
+could not be tuned to the outcome.
+
+\section{Pre-registration and data}
+
+The pre-registration (repository commit \prereghash, made before 2026 December 2) contains
+the candidate list with the source of every value, the analysis code (commit \codehash),
+the frozen model parameters and predictions for every candidate, the scoring rule and the
+decision thresholds. Any later deviation is reported as a dated amendment.
+
+\textit{Candidates.} The primary (forecast) sample comprises the \NG\ CRTS candidates of
+\citet{Graham2015} and the \NC\ PTF candidates of \citet{Charisi2016}. A secondary sample,
+the 36 strong and 221 weaker candidates of \citet{Foustoul2025}, is tested in the gap
+between their CRTS and ZTF data. The PS1 candidates of \citet{Liu2019} (discovery light
+curves not public) and the three ZTF candidates of \citet{Chen2024} (extended-baseline
+periods not tabulated) are listed but not scored.
+
+\textit{What is frozen.} No source paper published a phase or reference epoch, and
+\citet{Graham2015} and \citet{Charisi2016} gave no period uncertainties. We therefore
+freeze each published period exactly as printed, and derive the phase and amplitude only
+from discovery data obtained before the paper's arXiv v1 submission date (the GP posterior
+described below). These values were frozen before any DR4 data existed. The test is thus a
+test of the published period together with the phase implied by the discovery data.
+
+\textit{Data.} Discovery light curves are CRTS (Catalina Surveys data release; unfiltered,
+V-calibrated) for the Graham sample and PTF/iPTF Mould-$R$ \citep[IRSA;][]{Law2009} for the
+Charisi sample, binned by night. For each candidate, the Gaia test epochs are the DR4 G-band
+field-of-view transits after the arXiv v1 date of the source paper (2015 July 27 and 2016
+April 4), binned into visits of $\leq$1\,d. Candidates must have Gaia DR3 mean $G<20.7$.
+Nobody on the project inspected Gaia DR3 epoch photometry, which covers the first 34
+months of the DR4 window for some AGN; a robustness test uses only DR4 epochs after 2017
+May 28.
+
+\section{Method}
+
+Both models describe the discovery-band magnitude as a Gaussian process. Model D is a DRW
+with covariance $\sigma^2\exp(-|\Delta t|/\tau)$ plus a mean level. Model S adds
+$a\cos(2\pi t/P)+b\sin(2\pi t/P)$ at the published period $P$, with Gaussian priors on
+$a,b$. Hyperparameters ($\sigma,\tau$, an extra white-noise term, and the prior width of
+$a,b$ for model S) are fitted to the discovery data only and frozen. Conditioning on the
+discovery data gives each model's predictive distribution at the Gaia epochs; in model S
+this carries the posterior phase and amplitude of the sinusoid. Gaia magnitudes are
+modelled as $c+s\,x(t)+\epsilon$. The zero-point offset $c\sim\mathcal{N}(0,1\,\mathrm{mag}^2)$,
+the amplitude ratio $s\sim\ln\mathcal{N}(0,0.35^2)$ and the extra Gaia noise
+$j\sim$ half-normal(0.05\,mag) are marginalised identically in both models. The score is the
+predictive log Bayes factor
+\begin{equation}
+\ln B=\ln p(\mathbf{y}_{\rm G}\mid D_{\rm disc},S)-\ln p(\mathbf{y}_{\rm G}\mid D_{\rm disc},D).
+\end{equation}
+
+Because both models condition on the actual discovery data, the null distribution of
+$\ln B$ for each candidate is obtained by simulating Gaia data from model D's predictive
+distribution at the real DR4 epochs (1000 draws), which makes the selection of the
+candidates irrelevant to the calibration. Simulating from model S gives the power. A
+candidate is testable if \pending{testability rule as frozen}. An end-to-end simulation of
+DRW ``fake candidates'' selected to look at least as periodic as each real candidate, with
+all hyperparameters refitted, measured the per-candidate false-positive rate
+$r_0=$\pending{value} before release.
+
+Decision rules (frozen): (H1) the population shows an excess if the number $k$ of testable
+candidates with null $p<0.05$ has a one-sided binomial probability $<0.01$ under rate
+$\max(0.05,r_0)$; (H2) individual survivors have $\ln B>3$ and Benjamini--Hochberg
+$q<0.05$, and must beat 95\% of 200 phase-scrambled forecasts (H4); (H3) the fraction $f$ of
+true periodic sources is constrained with a mixture of the null and injection $\ln B$
+distributions, and we report its 95\% upper limit.
+
+\section{Results}
+
+\pending{Number of candidates with DR4 counterparts and enough test epochs; number
+testable.}
+
+\pending{Figure 1: distribution of $\ln B$ for testable candidates compared with the stacked
+null and injection distributions (left); posterior on $f$ (right).}
+
+\pending{H1 count $k$ vs. expected; survivors with $q$ values and H4 outcomes; $f$ upper
+limit; sensitivity analyses (steeper-spectrum null, DR4-only epochs, unbinned data, period
+marginalisation, wider amplitude-ratio prior).}
+
+\section{Discussion}
+
+\pending{Comparison with \citet{Foustoul2025} and \citet{ElBadry2026}; implications for the
+binary population and the PTA background \citep{Sesana2018}; limitations: sinusoid-only
+model \citep{Lin2026}, sparse Gaia cadence, filter differences.}
+
+\begin{acknowledgments}
+This work uses data from the European Space Agency mission Gaia, processed by the Gaia Data
+Processing and Analysis Consortium (DPAC); from the Catalina Real-time Transient Survey;
+and from the Palomar Transient Factory and the Zwicky Transient Facility, obtained from the
+NASA/IPAC Infrared Science Archive. [AI-USE STATEMENT --- TBD]
+\end{acknowledgments}
+
+\software{astropy, astroquery, celerite2 \citep{celerite2}, numpy, scipy, pandas}
+
+\bibliographystyle{aasjournal}
+\bibliography{refs}
+
+\end{document}
