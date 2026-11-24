@@ -92,15 +92,22 @@ def mock_cadence(g_mag, ecl_lat_deg, rng, t0=C.GAIA_DR4_START_MJD, t1=C.GAIA_DR4
 def clean_dr4_epochs(df: pd.DataFrame, win=(None, None)):
     """Per-transit G photometry -> visit-binned (t_mjd, mag, err).
 
-    Expected columns (DR3 naming; mapped on release day if DR4 differs, see prereg):
-      g_transit_time [BJD(TCB) - 2455197.5], g_transit_flux, g_transit_flux_error,
-      rejected_by_photometry, rejected_by_variability (booleans, optional).
+    Accepted columns (DR3 naming; mapped on release day if DR4 differs, see prereg):
+      either the array-table names g_transit_time [BJD(TCB) - 2455197.5], g_transit_flux,
+      g_transit_flux_error, or the DataLink long format band/time/flux/flux_error (G rows
+      kept); optional booleans rejected_by_photometry, rejected_by_variability.
     Rules: drop rejected transits, non-positive or non-finite flux; mag = -2.5 log10(flux)
     + ZP (ZP cancels in the free offset); err = 1.0857 sigma_F / F; convert time to MJD;
     keep transits inside the test window; bin transits closer than VISIT_GAP_D;
     drop visits > GAIA_OUTLIER_SIGMA robust sigma from the median.
     """
     d = df.copy()
+    # DataLink long format (one row per transit and band): band, time, flux, flux_error
+    if "g_transit_time" not in d and {"time", "flux", "flux_error"} <= set(d.columns):
+        if "band" in d:
+            d = d[d["band"].astype(str).str.strip().str.upper() == "G"]
+        d = d.rename(columns={"time": "g_transit_time", "flux": "g_transit_flux",
+                              "flux_error": "g_transit_flux_error"})
     for flag in ("rejected_by_photometry", "rejected_by_variability"):
         if flag in d:
             d = d[~d[flag].astype(bool)]

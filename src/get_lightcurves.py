@@ -88,6 +88,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("survey", choices=["crts", "ptf", "ztf"])
     ap.add_argument("--samples", default="")
+    ap.add_argument("--shard", default="0/1", help="k/n: process every n-th candidate starting at k")
     ap.add_argument("--wait-hours", type=float, default=0.0,
                     help="CRTS only: probe the server every 15 min for up to this long")
     a = ap.parse_args()
@@ -107,11 +108,15 @@ def main():
     if a.samples:
         cand = cand[cand["sample"].isin(a.samples.split(","))]
     cand = cand[np.isfinite(cand["ra_use"])]
+    k_sh, n_sh = (int(x) for x in a.shard.split("/"))
+    cand = cand.iloc[k_sh::n_sh]
     outdir = C.LC_DIR / a.survey
     outdir.mkdir(parents=True, exist_ok=True)
-    logf = C.LC_DIR / f"{a.survey}_log.csv"
+    logf = C.LC_DIR / (f"{a.survey}_log.csv" if n_sh == 1 else f"{a.survey}_log_shard{k_sh}.csv")
     log = pd.read_csv(logf) if logf.exists() else pd.DataFrame(columns=["cand_id"])
-    done = set(log["cand_id"])
+    done = set()
+    for lf in C.LC_DIR.glob(f"{a.survey}_log*.csv"):
+        done |= set(pd.read_csv(lf)["cand_id"])
     svc = None
     if a.survey == "ptf":
         import pyvo

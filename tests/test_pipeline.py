@@ -84,3 +84,15 @@ def test_periodogram_matches_direct_evidence():
             ref = (M.log_evidence(lc, hS.sigma, hS.tau, hS.jitter, P, hS.sigma_s)
                    - M.log_evidence(lc, hD.sigma, hD.tau, hD.jitter))
             assert np.isclose(dz[k, b], ref, atol=1e-6)
+
+
+def test_clean_dr4_epochs_long_format():
+    rng = np.random.default_rng(5)
+    n = 60
+    tt = np.sort(rng.uniform(1700, 3700, n))
+    flux = 10 ** (-0.4 * (19.5 - 25.6874)) * np.ones(n)
+    g = pd.DataFrame(dict(band="G", time=tt, flux=flux, flux_error=0.03 * flux,
+                          rejected_by_photometry=False, rejected_by_variability=False))
+    bp = g.assign(band="BP", flux=flux * 3)
+    T, Y, E = G.clean_dr4_epochs(pd.concat([g, bp]))
+    assert abs(np.median(Y) - 19.5) < 1e-6 and len(T) <= n
