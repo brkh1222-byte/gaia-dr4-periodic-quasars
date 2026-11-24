@@ -13,15 +13,16 @@ and published period P_i) and a mock Gaia DR4 cadence in the candidate's test wi
   1. simulate a DRW light curve at discovery and Gaia epochs (true hyperparameters = the
      candidate's model-D fit); Gaia data get nuisance draws s ~ LogN(0,0.35),
      j ~ HalfN(0.05), c ~ N(0, 0.3^2);
-  2. selection: GP periodogram  dlnZ(P) = ln Z_S(P) - ln Z_D  on 41 log-spaced periods in
-     [0.8 P_i, 1.25 P_i]; the maximum must be interior to the grid (a genuine peak inside the
-     window); accept if max dlnZ >= dlnZ of the real candidate at P_i
-     (the fake looks at least as periodic as the real one, at a similar period).
-     If fewer than K fakes are accepted in N_TRIALS_MAX trials, the K with the largest
-     dlnZ are used and the template is flagged 'relaxed';
-  3. the fake's 'published period' is its periodogram peak P_f; hyperparameters are refitted
-     from scratch exactly as for real candidates; lnB and the conditional p-value (N_COND
-     draws from the fitted model-D predictive) are computed exactly as for real data.
+  2. selection: the red-noise-weighted periodogram power at the candidate's published
+     period, dlnZ(P_i) = ln Z_S(P_i) - ln Z_D (a monotone function of the DRW-weighted
+     sinusoid power at P_i), must be >= the real candidate's value. The fake thus looks at
+     least as periodic at P_i as the real candidate. (A peak search over a period window was
+     tried and rejected: with red noise the maximum sits at the long-period edge of any window.)
+     If fewer than K fakes are accepted in N_TRIALS_MAX trials, the K with the largest dlnZ
+     are used and the template is flagged 'relaxed';
+  3. the fake's 'published period' is P_i; hyperparameters are refitted from scratch exactly
+     as for real candidates; lnB and the conditional p-value (N_COND draws from the fitted
+     model-D predictive) are computed exactly as for real data.
 Optionally (--psd dho) the fakes are generated from a steeper damped-harmonic-oscillator
 (CARMA(2,1)) process instead of a DRW, for the pre-registered sensitivity analysis.
 
@@ -44,9 +45,7 @@ import config as C  # noqa: E402
 import models as M  # noqa: E402
 import score as S  # noqa: E402
 
-N_GRID = 41
-GRID_LO, GRID_HI = 0.8, 1.25
-N_TRIALS_MAX = 20000
+N_TRIALS_MAX = 200000
 BATCH = 500
 N_COND = 200
 OFFSET_SIM_SIGMA = 0.3
@@ -117,11 +116,11 @@ def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):
     """Generate k accepted fakes for one template and score them end to end."""
     t_all = np.concatenate([lc.t, t_g])
     n_o = len(lc.t)
-    periods = hypS.period * np.exp(np.linspace(np.log(GRID_LO), np.log(GRID_HI), N_GRID))
+    periods = np.array([hypS.period])
     pg = Periodogram(lc.t, lc.e, lc.survey, lc.n_surveys, hypS, hypD, periods)
-    dz_real = pg.dlnZ(lc.y[:, None])[N_GRID // 2, 0]       # at the published period
+    dz_real = pg.dlnZ(lc.y[:, None])[0, 0]                  # at the published period
     acc_x, acc_dz, acc_P = [], [], []
-    pool = []   # (dz, P, x) of all trials, kept for the relaxed fallback (top only)
+    pool = []   # (dz, P, x): the k strongest trials, kept for the relaxed fallback
     n_trials = 0
     while len(acc_x) < k and n_trials < N_TRIALS_MAX:
         if psd == "drw":
@@ -130,15 +129,11 @@ def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):
             X = simulate_dho(t_all, hypD.sigma, hypD.tau, rng, BATCH)
         Yo = (np.median(lc.y) + X[:, :n_o] + lc.e * rng.standard_normal((BATCH, n_o))
               + hypD.jitter * rng.standard_normal((BATCH, n_o))).T
-        dz = pg.dlnZ(Yo)
-        ib = np.argmax(dz, axis=0)
-        best = dz[ib, np.arange(BATCH)]
-        interior = (ib > 0) & (ib < N_GRID - 1)        # a real peak inside the window
-        best = np.where(interior, best, -np.inf)
+        best = pg.dlnZ(Yo)[0]
         for b in np.where(best >= dz_real)[0]:
-            acc_x.append((X[b], Yo[:, b].copy())); acc_dz.append(best[b]); acc_P.append(periods[ib[b]])
+            acc_x.append((X[b], Yo[:, b].copy())); acc_dz.append(best[b]); acc_P.append(hypS.period)
         top = np.argsort(best)[-k:]
-        pool += [(best[b], periods[ib[b]], (X[b], Yo[:, b].copy())) for b in top if np.isfinite(best[b])]
+        pool += [(best[b], hypS.period, (X[b], Yo[:, b].copy())) for b in top]
         pool = sorted(pool, key=lambda z: -z[0])[:k]
         n_trials += BATCH
     relaxed = len(acc_x) < k
@@ -203,6 +198,9 @@ def main():
 
 def _append(out, rows, t0):
     df = pd.DataFrame(rows)
+    if df.empty:
+        print("template returned no fakes", flush=True)
+        return
     df.to_csv(out, mode="a", header=not out.exists(), index=False)
     print(f"{df.template.iloc[0]}: n={len(df)} relaxed={df.relaxed.iloc[0]} "
           f"acc={df.acc_rate.iloc[0]:.4f} frac(p<0.05)={np.mean(df.p < 0.05):.3f} "
