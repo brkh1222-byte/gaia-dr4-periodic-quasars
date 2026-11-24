@@ -98,18 +98,14 @@ class Periodogram:
 # ---------------------------------------------------------------------------
 def simulate_dho(t, sigma, tau, rng, n_draws, q=0.4):
     """Steeper-PSD alternative: a damped harmonic oscillator (CARMA(2,1)-like) with the same
-    variance sigma^2 and characteristic timescale tau (celerite2 SHOTerm, quality factor q)."""
-    import celerite2
+    variance sigma^2 and characteristic timescale tau (celerite2 SHOTerm, quality factor q).
+    Drawn by dense Cholesky (a few hundred epochs)."""
     from celerite2 import terms
-    w0 = 1.0 / tau
-    k = terms.SHOTerm(sigma=sigma, w0=w0, Q=q)
-    gp = celerite2.GaussianProcess(k, mean=0.0)
-    gp.compute(np.sort(t), diag=np.full(len(t), 1e-10))
-    o = np.argsort(t)
-    draws = gp.sample(size=n_draws, random_state=int(rng.integers(2**31)))
-    out = np.empty((n_draws, len(t)))
-    out[:, o] = np.atleast_2d(draws)
-    return out
+    k = terms.SHOTerm(sigma=sigma, w0=1.0 / tau, Q=q)
+    t = np.asarray(t, float)
+    K = k.get_value(np.abs(np.subtract.outer(t, t)))
+    L = np.linalg.cholesky(K + 1e-10 * np.eye(len(t)))
+    return (L @ rng.standard_normal((len(t), n_draws))).T
 
 
 def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):

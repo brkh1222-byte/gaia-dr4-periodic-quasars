@@ -96,3 +96,11 @@ def test_clean_dr4_epochs_long_format():
     bp = g.assign(band="BP", flux=flux * 3)
     T, Y, E = G.clean_dr4_epochs(pd.concat([g, bp]))
     assert abs(np.median(Y) - 19.5) < 1e-6 and len(T) <= n
+
+
+def test_simulate_dho_variance():
+    import simulate_null as SN
+    rng = np.random.default_rng(6)
+    t = np.array([0.0, 10.0, 500.0])
+    x = SN.simulate_dho(t, 0.3, 200.0, rng, 50000)
+    assert np.allclose(x.var(axis=0), 0.09, rtol=0.05)
