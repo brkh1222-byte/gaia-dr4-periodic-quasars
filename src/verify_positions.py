@@ -34,13 +34,17 @@ def cone(cat, ra, dec, radius):
     src, cols = CATS[cat]
     params = {"-source": src, "-c": f"{ra:.6f} {dec:+.6f}", "-c.rs": radius,
               "-out": cols, "-sort": "_r", "-out.max": 5}
-    for attempt in range(4):
+    for attempt in range(8):
         try:
             r = requests.get(ASU, params=params, timeout=60)
             r.raise_for_status()
-            break
+            # a valid answer (even an empty one) carries the column definitions; the mirror
+            # sometimes returns truncated/malformed pages, which are retried
+            if "#Column" in r.text:
+                break
         except requests.RequestException:
-            time.sleep(5 * (attempt + 1))
+            pass
+        time.sleep(5 * (attempt + 1))
     else:
         raise RuntimeError(f"VizieR query failed for {ra},{dec}")
     lines = [ln for ln in r.text.splitlines() if ln and not ln.startswith("#")]
