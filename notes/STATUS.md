@@ -1,4 +1,4 @@
-# STATUS — 2026-11-24 17:40 UTC
+# STATUS — 2026-11-24 18:00 UTC
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -33,6 +33,13 @@
 - PTF for Graham (fallback group forecast_alt) downloaded; provisional full freeze running
   -> results/frozen_provisional/ (not final; final freeze after CRTS passes, by ~28 Nov).
 - Sensitivity modes + negative control in analyze_dr4.py (--sensitivity ...); figures.py.
+
+## Provisional freeze (results/frozen_provisional, 18:00 UTC)
+- forecast 63 scored (Graham-CRTS 32 + Charisi 31): 56 with mock power >= 0.5
+- forecast_alt 43 (Graham via PTF): 39 with power >= 0.5;  gap 73 (Foustoul ZTF-only): 7
+- 33 Graham with neither CRTS nor PTF (so far)
+- Null sims for Graham templates running: 2 shards
+  `nice .venv/bin/python src/simulate_null.py --k 200 --workers 1 --shard k/2 --frozen-dir results/frozen_provisional --groups forecast,forecast_alt`
 
 ## Design changes today (see notes/decisions.md)
 - sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
