@@ -116,8 +116,9 @@ def main():
         lzS = M.log_evidence(lc, hS.sigma, hS.tau, hS.jitter, P, hS.sigma_s)
         lzD = M.log_evidence(lc, hD.sigma, hD.tau, hD.jitter)
         amp, amp_sd, t_bright, ph_sd = ephemeris(lc, hS, win[0])
+        group = "forecast_alt" if "fallback" in info["survey"] else row["group"]
         params.append(dict(
-            cand_id=row.cand_id, sample=row["sample"], group=row["group"], name=row["name"],
+            cand_id=row.cand_id, sample=row["sample"], group=group, name=row["name"],
             ra_deg=row.ra_deg, dec_deg=row.dec_deg, period_d=P, period_err_sensitivity_d=sp,
             disc_survey=info["survey"], n_disc_nights=len(lc.t), n_surveys=lc.n_surveys,
             disc_t_first=lc.t.min(), disc_t_last=lc.t.max(),

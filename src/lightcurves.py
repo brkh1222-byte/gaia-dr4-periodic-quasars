@@ -15,6 +15,8 @@ All    epochs within 0.5 d of each other (same night) are averaged (inverse-vari
        5 robust sigma (1.4826 MAD) from the light-curve median are dropped.
 
 Discovery data and test window (MJD), per analysis group
+  forecast_alt (Graham+2015 objects whose CRTS light curve could not be retrieved): PTF/iPTF R
+      nights before the cutoff; same test window; reported separately from the primary test.
   forecast (Graham+2015 CRTS; Charisi+2016 PTF/iPTF R):
       discovery = survey nights with t < cutoff, cutoff = arXiv v1 date of the paper;
       test window = [cutoff, end of DR4].
@@ -150,13 +152,23 @@ def discovery_data(row):
     info = {"cand_id": cid}
     if sample == "Graham2015":
         lc = load_crts(cid, ra, dec)
-        if lc is None:
-            return None, None, {**info, "reason": "no CRTS light curve"}
-        t, y, e = lc
-        m = t < cutoff
-        L = M.LightCurve(t[m], y[m], e[m])
         win = (cutoff, C.GAIA_DR4_END_MJD)
-        info.update(survey="CRTS", n_disc=int(m.sum()), n_crts_after_cutoff_unused=int((~m).sum()))
+        if lc is not None:
+            t, y, e = lc
+            m = t < cutoff
+            L = M.LightCurve(t[m], y[m], e[m])
+            info.update(survey="CRTS", n_disc=int(m.sum()), n_crts_after_cutoff_unused=int((~m).sum()))
+        else:
+            # Fallback (group forecast_alt, reported separately): the CRTS service was
+            # intermittent in Nov 2026; PTF/iPTF R data before the cutoff are used instead.
+            # These are not Graham's discovery data.
+            parts = [(t[t < cutoff], y[t < cutoff], e[t < cutoff]) for t, y, e in load_ptf(cid, ra, dec)]
+            parts = [p for p in parts if len(p[0]) >= 5]
+            if not parts:
+                return None, None, {**info, "reason": "no CRTS (service) and no PTF light curve"}
+            L = _stack(parts)
+            info.update(survey="PTF-R (fallback: CRTS unavailable)", n_disc=len(L.t),
+                        n_ptf_oids=len(parts))
     elif sample == "Charisi2016":
         parts = [(t[t < cutoff], y[t < cutoff], e[t < cutoff]) for t, y, e in load_ptf(cid, ra, dec)]
         parts = [p for p in parts if len(p[0]) >= 5]
