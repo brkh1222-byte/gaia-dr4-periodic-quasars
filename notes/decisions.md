@@ -30,3 +30,26 @@ A period-window peak search was rejected: with red noise the evidence periodogra
 long periods, so the maximum sat at the window edge for nearly every fake and for the real
 candidates too. Fakes are now selected by their red-noise-weighted power at the published
 period being at least the real candidate's.
+
+## 2026-11-24 — Open choices decided by Claude (researcher away; listed in the report for review)
+1. **Testability rule: power(p < 0.05) >= 0.5**, computed from the real DR4 timestamps and
+   errors only (1000 model-S draws). Reasons: the H1 statistic is the count of p < 0.05, so this
+   is power for the statistic actually used; the binomial test keeps its size whatever rule is
+   chosen (the rule only affects power); >= 0.8 would drop about a third of informative
+   candidates (forecast mock: 56 vs 35 of 63); the research plan's P(lnB > 3) >= 0.8 keeps only
+   20 of 63.
+2. **Graham objects without CRTS data at the freeze:** use PTF/iPTF R data before the cutoff as
+   the conditioning data, in a separate group `forecast_alt`, reported separately and NOT part of
+   the primary H1–H3 test (the primary test uses only discovery-survey data: Graham-CRTS and
+   Charisi-PTF). Objects with neither are listed as untestable. Reasons: stays faithful to option
+   A for the headline while not discarding blind information. A pooled forecast + forecast_alt
+   H1 is reported as a secondary analysis with the same r0_used.
+3. **Survivor tiers:** "survivor" = ln B > 3 and BH q < 0.05 (H2). "Ephemeris-specific survivor"
+   = survivor that also passes H4 (beats 95% of 200 phase-shifted forecasts). Reason: in the dress
+   rehearsal with every ephemeris true, only 7 of 19 candidates with ln B > 3 passed H4. H4 tests
+   phase specificity, which a real binary with a poorly constrained discovery phase can fail, so
+   making it a gate would mostly lose true signals. Both tiers are reported; neither is called
+   a "confirmed binary".
+4. **Commit trailer:** the coordinator asked (2026-11-24) for "Claude Fable 5.2" in the trailers.
+   The commits are made by Claude Opus 5.5, as stated in the harness attribution, so the accurate
+   trailer is kept. Flagged in the report.
