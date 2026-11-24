@@ -108,7 +108,7 @@ def simulate_dho(t, sigma, tau, rng, n_draws, q=0.4):
     return (L @ rng.standard_normal((len(t), n_draws))).T
 
 
-def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):
+def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw", seed=None):
     """Generate k accepted fakes for one template and score them end to end."""
     t_all = np.concatenate([lc.t, t_g])
     n_o = len(lc.t)
@@ -153,17 +153,17 @@ def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):
         rows.append(dict(template=row["cand_id"], sample=row["sample"], P_template=hypS.period,
                          P_fake=Pf, dlnZ_fake=dzv, dlnZ_real=dz_real, lnB=lnb, p=p,
                          sigma_s_fit=hS.sigma_s, tau_fit=hD.tau, relaxed=relaxed,
-                         acc_rate=acc_rate, n_trials=n_trials, psd=psd))
+                         acc_rate=acc_rate, n_trials=n_trials, psd=psd, seed=seed))
     return rows
 
 
 # ---------------------------------------------------------------------------
 def _template_job(args):
-    cid, k, seed, psd = args
+    cid, k, seed, psd, fdir = args
     import frozen  # noqa: WPS433  (local module: loads frozen fits + mock cadence)
     rng = np.random.default_rng(seed)
-    row, lc, hS, hD, t_g, e_g = frozen.load_template(cid)
-    return run_template(row, lc, hS, hD, t_g, e_g, k, rng, psd)
+    row, lc, hS, hD, t_g, e_g = frozen.load_template(cid, fdir)
+    return run_template(row, lc, hS, hD, t_g, e_g, k, rng, psd, seed)
 
 
 def main():
@@ -174,18 +174,21 @@ def main():
     ap.add_argument("--psd", default="drw", choices=["drw", "dho"])
     ap.add_argument("--out", default="")
     ap.add_argument("--shard", default="0/1", help="k/n: run every n-th template (separate processes)")
+    ap.add_argument("--frozen-dir", default=str(C.RESULTS / "frozen"))
+    ap.add_argument("--groups", default="forecast")
     a = ap.parse_args()
     import frozen
-    ids = a.templates.split(",") if a.templates else frozen.template_ids()
+    ids = a.templates.split(",") if a.templates else frozen.template_ids(a.frozen_dir, tuple(a.groups.split(",")))
     k_sh, n_sh = (int(x) for x in a.shard.split("/"))
-    seeds = {cid: C.RANDOM_SEED + 7919 * i + (0 if a.psd == "drw" else 1) for i, cid in enumerate(ids)}
+    seeds = {cid: C.RANDOM_SEED + frozen.cid_seed(cid) % 1000003 + (0 if a.psd == "drw" else 1)
+             for cid in ids}
     ids = ids[k_sh::n_sh]
     out = Path(a.out) if a.out else C.RESULTS / (f"null_sim_{a.psd}.csv" if n_sh == 1
                                                  else f"null_sim_{a.psd}_shard{k_sh}.csv")
     done = set()
     for f in C.RESULTS.glob(f"null_sim_{a.psd}*.csv"):
         done |= set(pd.read_csv(f)["template"])
-    jobs = [(cid, a.k, seeds[cid], a.psd) for cid in ids if cid not in done]
+    jobs = [(cid, a.k, seeds[cid], a.psd, a.frozen_dir) for cid in ids if cid not in done]
     print(f"{len(jobs)} templates to run, k={a.k}, workers={a.workers}", flush=True)
     t0 = time.time()
     if a.workers > 1:
