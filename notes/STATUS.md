@@ -1,4 +1,4 @@
-# STATUS — 2026-11-24 17:00 UTC
+# STATUS — 2026-11-24 17:40 UTC
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -29,8 +29,10 @@
 ## Results so far
 - Charisi null calibration complete: 6200 fakes, r0 = 0.061 (95% CI 0.055-0.066), lnB>3 0.56%.
 - Dress rehearsal (Charisi, mock DR4): null k=2/30, no survivors; signal H1 rejects, 7/19 pass H4.
-- DHO sensitivity null sim running (k=100): results/null_sim_dho*.csv
-- PTF for Graham (fallback group forecast_alt) downloading.
+- DHO sensitivity null sim done: 3100 fakes, r0 = 0.051 (95% upper 0.058), lnB>3 1.3%.
+- PTF for Graham (fallback group forecast_alt) downloaded; provisional full freeze running
+  -> results/frozen_provisional/ (not final; final freeze after CRTS passes, by ~28 Nov).
+- Sensitivity modes + negative control in analyze_dr4.py (--sensitivity ...); figures.py.
 
 ## Design changes today (see notes/decisions.md)
 - sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
