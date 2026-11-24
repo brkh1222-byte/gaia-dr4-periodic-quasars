@@ -115,7 +115,41 @@ The field agrees that most candidates are red noise. It disagrees on what a real
 
 ## A.5 Standard methods, datasets, tools and pitfalls
 
-_(in progress)_
+The standard toolkit is a periodogram or Bayesian search against a damped-random-walk null, followed by a longer-baseline check. The pitfalls are mostly about leaking information and about a null model that is too lenient.
+
+**Datasets.**
+
+| Dataset | Coverage | Access | Watch out for |
+| --- | --- | --- | --- |
+| Gaia DR4 `epoch_photometry` | 25 Jul 2014 – 20 Jan 2020, G/BP/RP per field-of-view transit, all ~2.8 billion processed sources. ~70 transits per source as a sky average over 60 months; real medians 20–30% lower ([ESA](https://www.cosmos.esa.int/web/gaia/science-performance)) | DataLink via `astroquery.gaia` `Gaia.load_data(..., retrieval_type='EPOCH_PHOTOMETRY')`, ≤ 5,000 IDs per call; select with `has_epoch_photometry` | Draft DR4 format has no DR3-style `rejected_by_*` columns. Variability flags sit in a separate `vari_epoch_flags` product. New `spurious_signal` table flags scan-angle artefacts. The data model may still change. |
+| Gaia DR3 epoch photometry | Jul 2014 – May 2017, ~1 million AGN light curves ([Carnerero et al. 2023](https://arxiv.org/abs/2207.06849)) | Public now | Overlaps the DR4 window. Must not be inspected (blindness). |
+| CRTS (now CSDR3) | 2005 – **mid-2016** ([release page](http://nesssi.cacr.caltech.edu/DataRelease/)) | HTTP cone search; catalinadata.org no longer resolves | Runs ~2 years into the Gaia window. Unfiltered (≈V) aperture photometry, 0.06–0.08 mag zero-point scatter, blends, 4 exposures per night. |
+| PTF / iPTF | 2009–2012 / 2013 – Feb 2017 ([IRSA](https://irsa.ipac.caltech.edu/Missions/ptf.html)) | IRSA light-curve tables | iPTF overlaps the Gaia window. |
+| ZTF DR24 | Mar 2018 – Oct 2025 ([IRSA](https://irsa.ipac.caltech.edu/Missions/ztf.html)) | IRSA light-curve API (`COLLECTION=ztf_dr24`) | Inside the Gaia window: exploratory use only. |
+
+**Tools.**
+
+- **celerite2** — fast Gaussian processes. A DRW is `terms.RealTerm(a=σ², c=1/τ)`. `gp.predict(y, t=t_new, return_cov=True)` gives the conditional forecast ([docs](https://celerite2.readthedocs.io/en/latest/api/python/)).
+- **EzTao** — CARMA and damped-harmonic-oscillator models for a steeper-noise sensitivity check ([Yu et al. 2022](https://arxiv.org/abs/2201.08943)). It is built on celerite, not celerite2.
+- **scipy** — `scipy.stats.false_discovery_control(p, method='bh')` for Benjamini–Hochberg.
+- **Background reading:** Gaussian-process prediction in [Rasmussen & Williams, ch. 2](https://gaussianprocess.org/gpml/chapters/RW2.pdf). The predictive score is ln p(y_Gaia | y_old) = ln p(y_all) − ln p(y_old).
+
+**Key pitfalls for this project.**
+
+1. **"Published ephemerides" mostly do not exist.** Graham 2015 Table 2 gives only periods. Charisi 2016 gives period and variability fraction, with no phase. Phase and amplitude must be fitted to pre-cut-off data with the published period fixed, labelled "derived", and the procedure pre-registered. Never fill gaps by hand.
+2. **Blindness leaks through other surveys.** Gaia DR3, CRTS after mid-2014, iPTF, ZTF, ASAS-SN and ATLAS all cover 2014–2020. Cut all training data at 25 Jul 2014, or earlier if the discovery paper's data ended earlier. Record who has seen which data.
+3. **Winner's curse.** Candidates were selected for strong sinusoid fits, so fitted amplitudes are biased high. Make the null simulations reproduce the selection, so the bias is calibrated, not ignored.
+4. **Improper offset priors break Bayes factors.** The Gaia–survey offset needs the same *proper* prior (e.g. N(0, 0.3–0.5 mag)) in both models, marginalised in closed form. A "huge" prior makes lnB arbitrary.
+5. **A DRW null is too lenient.** Real quasar power spectra are steeper at high frequency ([Mushotzky et al. 2011](https://arxiv.org/abs/1111.0672)). CRTS baselines are shorter than 10τ, which biases τ ([Kozłowski 2017](https://arxiv.org/abs/1611.08248)). Marginalise over (σ, τ), and run a damped-harmonic-oscillator/CARMA sensitivity check.
+6. **Long periods have little power.** For P ≳ 2–3 yr, Gaia sees ≤ 2–3 cycles, and the offset and amplitude become degenerate with the signal. Hence the simulation-based testability cut.
+7. **Gaia's faint end.** On-board detection stops near G ≈ 20.7 ([Riello et al. 2021](https://arxiv.org/abs/2012.01916)), so faint epochs go missing and errors are underestimated. Work in flux, add a jitter term, and pre-register a faint cut (e.g. median G > 20.3 flagged).
+8. **Correlated Gaia sampling.** Transits 106 minutes apart and same-day clusters are not independent. Bin within ~1 day, or model them with the full covariance (pre-register which).
+9. **Scan-angle artefacts.** Host galaxies and close pairs create false signals near 1 yr, 0.5 yr, 63 d and 31.5 d ([Holl et al. 2023](https://arxiv.org/abs/2212.11971)). Use the DR4 `spurious_signal` table and pre-register a cut.
+10. **Use G only.** BP/RP are unreliable for faint and extended sources.
+11. **CRTS systematics.** Bin the 4 nightly exposures, add a CRTS jitter, and pre-register the cleaning (e.g. Graham's median filter plus clipping).
+12. **Time systems.** Gaia uses BJD(TCB) − 2455197.5; CRTS and ZTF use MJD. Document the conversion, and confirm each published period is observed-frame.
+
+*Unverified until release day:* Gaia's per-transit G precision at G ≈ 19–20.5, the exact `data_release='Gaia DR4'` string and TAP schema name, and whether `valid_data=True` behaves as in DR3.
 
 ## A.6 Verified references (citation check of PROPOSAL.md)
 
@@ -166,7 +200,49 @@ Three changes sharpen the proposal's question:
 
 ## B.2 Study design and methods
 
-_(in progress)_
+**Design: a pre-registered, per-candidate forecast test with simulation-calibrated statistics.** We freeze a prediction for every candidate before release, then score each against Gaia with one rule. Each part of the design below targets a specific pitfall from A.5.
+
+**1. Sample, in tiers decided before release.**
+
+| Tier | Catalogues | Role | Why |
+| --- | --- | --- | --- |
+| A (primary, forecast) | Graham 2015 CRTS (111, incl. PG 1302-102); Charisi 2016 PTF (33) | Confirmatory test of H1–H4 | Periods published 2015–2016, before any Gaia quasar light curves. Training data can be cut at or before 25 Jul 2014. |
+| B (independent instrument) | Foustoul 2025 strong (36); Chen 2024 final (86) | Separate confirmatory group, reported separately | Their fits used ZTF (2018+), so Gaia partly interpolates or retrodicts. Still an independent instrument. |
+| C (exploratory) | Foustoul weaker (221); Liu 2016/2019 PS1 with expected G < 20.7 | Exploratory only | Weak or faint; low power expected. |
+| Excluded | Huijse / El-Badry Gaia DR3 candidates | – | Selected from Gaia data that overlap DR4 (circular). |
+
+If Tier B cannot be frozen properly before release, drop it from the confirmatory test rather than freezing it late.
+
+**2. Freezing the ephemeris (provenance first).**
+
+- **Period:** the published value and error, copied with table and row citation. Confirm it is in the observed frame.
+- **Phase and amplitude:** fit sinusoid + DRW to the candidate's discovery-survey data *before its cut-off*, with the period fixed at the published value. Store posterior samples, flag the values "derived", and cite the data used. Graham 2015 gives periods only, so this step is unavoidable. It is not invention, because the procedure is pre-registered and reproducible.
+- **Cut-off:** the earlier of 25 Jul 2014 and the last epoch the discovery paper used. Later CRTS, iPTF and ZTF data are not used for training.
+- **What is committed:** `frozen_params.csv` (with a SHA-256 hash), the posterior samples, predictions on a daily grid for 2014–2020, and the exact code commit. Gaia's epochs are unknown until release, so the frozen code evaluates the frozen models at the real epochs.
+
+**3. Models (both in celerite2, magnitudes, G band only).**
+
+- **M_DRW:** constant mean + DRW kernel (σ, τ), with (σ, τ) marginalised over their posterior from the discovery data.
+- **M_sin:** the same plus the frozen sinusoid (P, φ, A) drawn from its posterior.
+- **Shared nuisance terms**, with identical proper priors in both models: Gaia offset ~ N(0, 0.4 mag), marginalised in closed form; G/V amplitude ratio ~ log-normal(0, 0.3); Gaia jitter.
+
+**4. Gaia processing rules (written as intent, with fallbacks, because the DR4 data model may change).**
+
+- Cross-match within 1″ to a unique DR4 source.
+- Use G only. Drop epochs with no valid G flux.
+- Bin transits within 1 day (inverse-variance mean).
+- Flag scan-angle artefacts using `spurious_signal` (e.g. IPD correlation > 0.8); exclude flagged sources from the primary test.
+- Flag sources with median G > 20.3.
+- Require ≥ 10 binned epochs after the candidate's cut-off.
+
+**5. Pre-registration mechanics.**
+
+- Write `preregistration/prereg.md`: hypotheses, tiers, cut-offs, every rule in B.2–B.3, thresholds, the planned figure, and a statement of which data each person has seen (no Gaia DR3/DR4 epoch photometry; no post-cut-off CRTS/iPTF/ZTF for Tier A).
+- Commit, tag `prereg-v1`, push.
+- Archive the tagged release on **Zenodo** (DOI) or as an **OSF registration**. A git commit date can be set by the author; an archive gives an independent timestamp.
+- Finish by 1 Dec, safely before release at ~12:00 CET on 2 Dec.
+
+**Why this design.** Forecasting (rather than re-detecting periods in 5.5 years of sparse Gaia data) uses the strongest information a binary claim makes: where the light curve should be next. Simulation calibration handles the winner's curse and the DRW null's leniency. The power cut stops weak data from producing either fake survivors or fake rejections.
 
 ## B.3 Analysis plan: statistics, controls, decision rules
 
@@ -180,11 +256,11 @@ Every candidate gets one number, the predictive log Bayes factor lnB. Simulation
 
 Both predictive densities are Gaussian-process conditionals computed with celerite2. lnB > 0 means the sinusoid predicted Gaia better. Nuisance parameters are fixed in advance and marginalised the same way in both models:
 
-- a Gaia–survey magnitude offset (analytic, broad Gaussian prior);
+- a Gaia–survey magnitude offset (closed form, proper prior N(0, 0.4 mag), identical in both models);
 - a band amplitude ratio G/V (grid over a pre-set log-normal prior);
 - a Gaia white-noise jitter (grid, prior centred on Gaia's documented per-transit precision at the candidate's G magnitude, fixed before release).
 
-**2. Null calibration (what lnB looks like if the candidate is red noise).** For each candidate, simulate 1,000 DRW light curves using its own discovery cadence, errors and fitted DRW parameters. Keep only the simulations that pass a simplified copy of the discovery selection: periodogram peak in the searched range, at least 1.5 cycles, and amplitude at least as large as published. Fit their "ephemerides", extend each light curve onto Gaia's cadence and noise, and score them. This gives a null distribution and a p-value pᵢ for every candidate.
+**2. Null calibration (what lnB looks like if the candidate is red noise).** For each candidate, simulate 1,000 DRW light curves using its own discovery cadence, errors and fitted DRW parameters. Keep only the simulations that pass a simplified copy of the discovery selection: periodogram peak in the searched range, at least 1.5 cycles, and fitted amplitude at least as large as the candidate's derived amplitude. Fit their "ephemerides", extend each light curve onto Gaia's cadence and noise, and score them. This gives a null distribution and a p-value pᵢ for every candidate.
 
 **3. Injection (what lnB looks like if the candidate is real).** Simulate the published sinusoid plus DRW on the same cadences and score it. This gives the signal distribution and each candidate's power.
 
