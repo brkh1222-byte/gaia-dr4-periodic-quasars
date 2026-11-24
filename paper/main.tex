@@ -8,13 +8,13 @@
 \usepackage{amsmath}
 
 % ---- numbers filled from the repository (update before submission) ----
-\newcommand{\Ncand}{[N\_CAND]}            % candidates in the scored samples
+\newcommand{\Ncand}{67}            % candidates in the scored samples
 \newcommand{\Ntest}{[N\_TESTABLE]}        % testable candidates
 \newcommand{\NG}{111}                     % Graham+2015
 \newcommand{\NC}{33}                      % Charisi+2016 final sample
 \newcommand{\NF}{257}                     % Foustoul+2025 (36 + 221)
 \newcommand{\prereghash}{[PREREG\_COMMIT\_HASH]}
-\newcommand{\codehash}{[ANALYSIS\_CODE\_HASH]}
+\newcommand{\codehash}{9284e83}
 \newcommand{\pending}[1]{\textbf{[PENDING: #1]}}
 
 \begin{document}
@@ -84,7 +84,7 @@ Catalina Surveys data release; unfiltered, V-calibrated) for the Graham sample a
 Mould-$R$ \citep[IRSA;][]{Law2009} for the Charisi sample, binned by night. The CRTS service was
 intermittent in November 2026; Graham candidates whose CRTS light curve could not be retrieved
 before the freeze are conditioned on PTF/iPTF data before the cutoff instead and reported
-separately (\pending{number}). For each candidate, the Gaia test epochs are the DR4 G-band
+separately (41 objects; 36 more have neither). For each candidate, the Gaia test epochs are the DR4 G-band
 field-of-view transits after the arXiv v1 date of the source paper (2015 July 27 and 2016
 April 4), binned into visits of $\leq$1\,d. Candidates must have Gaia DR3 mean $G<20.7$.
 Nobody on the project inspected Gaia DR3 epoch photometry, which covers the first 34
@@ -120,7 +120,7 @@ The plug-in hyperparameters make these $p$-values slightly optimistic. Before re
 simulated DRW ``fake candidates'' on each forecast candidate's cadence. Each fake was required
 to look at least as periodic at the published period as the real candidate, had all
 hyperparameters refitted, and was scored exactly as the data. This gave a per-candidate
-false-positive rate $r_0=$\pending{value; 0.061 for the PTF sample} instead of 0.05. A steeper
+false-positive rate $r_0=0.056$ (13,400 fakes; 95\% upper bound 0.060) instead of 0.05. A steeper
 (damped harmonic oscillator) red-noise process gave $r_0=0.051$ for the PTF sample.
 
 Decision rules (frozen): (H1) the population shows an excess if the number $k$ of testable

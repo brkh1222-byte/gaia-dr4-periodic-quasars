@@ -1,4 +1,4 @@
-# STATUS — 2026-11-24 ~18:30 UTC
+# STATUS — 2026-11-24 ~19:15 UTC — STOP POINT REACHED (awaiting approval of preregistration/)
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -45,18 +45,21 @@
 - sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
 - Charisi mock power: 29/31 have power(p<0.05) >= 0.5.
 
-## Next (in order; all resumable)
-1. Let CRTS passes continue (detached; crts_run.out). Graham null sims (2 shards) are running
-   and resume by skipping finished templates.
-2. DR3 code test of release-day scripts: `src/gaia_epochs.py --test-dr3` (3 non-candidate
-   control stars; never candidates) and `src/gaia_xmatch.py --test-dr3` (positions only).
-3. Final freeze ~27-28 Nov: `src/frozen.py` (-> results/frozen), rerun null sims for templates
-   whose conditioning data changed (forecast_alt -> forecast if CRTS arrived), full dress
-   rehearsal `src/analyze_dr4.py --mock null|signal --groups forecast,forecast_alt`,
-   `notebooks/make_01_sample.py`.
-4. Commit code, record hash, `src/make_prereg.py --code-hash <hash> --power-rule 0.5`.
-   DO NOT git add preregistration/ (needs the researcher's OK).
-5. Update notes/prereg_summary.md with the final numbers; final report.
+## State at the stop point
+- Freeze: results/frozen (67 forecast, 41 forecast_alt, 73 gap). Analysis code commit 9284e83.
+- preregistration/ assembled by `src/make_prereg.py --code-hash 9284e83... --power-rule 0.5`,
+  UNSTAGED. r0 = 0.0562, r0_used = 0.0596. Summary: notes/prereg_summary.md.
+- Dress rehearsal on mock DR4 passed (results/dress_rehearsal_*).
+- Gaia archive is down 25 Nov 12:00 CET -> 2 Dec; DR3 mean G cached; scripts tested on DR3.
+
+## Next
+1. On approval: `git add preregistration && git commit && git push` (before 2 Dec 12:00 CET).
+   Recommended: merge research-plan into main first so it is on the default branch.
+2. CRTS retries continue (detached). If more Graham objects arrive BEFORE approval: rerun
+   `src/frozen.py`, drop changed templates from results/null_sim_drw*.csv, rerun
+   `src/simulate_null.py --k 200 --workers 1 --groups forecast,forecast_alt --out results/null_sim_drw_refresh2.csv`,
+   commit code, rerun make_prereg with the new hash.
+3. After DR4 release and the public prereg commit: gaia_xmatch.py, gaia_epochs.py, analyze_dr4.py.
 
 ## Risks
 - CRTS outage: Graham (111) is the largest forecast sample. If CRTS does not return before

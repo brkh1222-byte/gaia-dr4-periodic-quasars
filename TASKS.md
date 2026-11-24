@@ -14,18 +14,18 @@
   - Liu+2019 PS1 (only those with G < 20.7).
 
   Use VizieR or the paper tables, and record the source of every row.
-- [ ] **T1.2** Write `src/get_crts.py` and `src/get_ztf.py` to download CRTS DR2 and ZTF DR24 light curves for all candidates into `data/`.
-- [ ] **T1.3** Write `notebooks/01_sample.ipynb` covering magnitude cuts and expected Gaia testability (G ≈ 20.7 limit).
+- [x] **T1.2** Write `src/get_crts.py` and `src/get_ztf.py` (implemented as `src/get_lightcurves.py crts|ptf|ztf`; CRTS retries still running because the server is intermittent) to download CRTS DR2 and ZTF DR24 light curves for all candidates into `data/`.
+- [x] **T1.3** Write `notebooks/01_sample.ipynb` covering magnitude cuts and expected Gaia testability (G ≈ 20.7 limit).
 
 ## Phase 2: Models and PRE-REGISTRATION (before 2 Dec)
-- [ ] **T2.1** Write `src/models.py`:
+- [x] **T2.1** Write `src/models.py`:
   - (a) sinusoid with the published period/phase/amplitude plus DRW noise;
   - (b) pure DRW (celerite2).
 
   Both are fitted only to pre-2014.5 data (CRTS/PTF). Each produces the predictive mean and covariance at arbitrary times in 2014–2020.
-- [ ] **T2.2** Write `src/score.py`: the log predictive likelihood of new data under each model and the Bayes factor, with pre-specified free nuisance parameters only (Gaia G offset and scale relative to the original band).
-- [ ] **T2.3** Write `src/simulate_null.py`: DRW-simulated fake "candidates" selected with a simple periodogram cut, to calibrate the Bayes factor distribution.
-- [ ] **T2.4 PRE-REGISTRATION.** Write `preregistration/prereg.md` covering the hypotheses, sample cuts, frozen model parameters (`preregistration/frozen_params.csv`), scoring rule, the population test, and the analysis code commit hash. **The researcher reviews it; commit and push before 2 Dec 2026.** Never edit it afterwards; add dated amendments.
+- [x] **T2.2** Write `src/score.py`: the log predictive likelihood of new data under each model and the Bayes factor, with pre-specified free nuisance parameters only (Gaia G offset and scale relative to the original band).
+- [x] **T2.3** Write `src/simulate_null.py`: DRW-simulated fake "candidates" selected with a simple periodogram cut, to calibrate the Bayes factor distribution.
+- [ ] **T2.4 PRE-REGISTRATION.** (Drafted and assembled in `preregistration/`, NOT committed: awaiting the researcher's approval; summary in `notes/prereg_summary.md`.) Write `preregistration/prereg.md` covering the hypotheses, sample cuts, frozen model parameters (`preregistration/frozen_params.csv`), scoring rule, the population test, and the analysis code commit hash. **The researcher reviews it; commit and push before 2 Dec 2026.** Never edit it afterwards; add dated amendments.
 
 ## Phase 3: After DR4 release (2 Dec onwards)
 - [ ] **T3.1** Write `src/gaia_xmatch.py`: a TAP cross-match of candidates to DR4 `source_id` (1″ radius), saving `data/gaia_ids.csv`.
