@@ -1,0 +1,21 @@
+{
+  "H1": {
+    "n_testable": 45,
+    "k": 2,
+    "rate": 0.05,
+    "expected": 2.25,
+    "p_binom": 0.6650433448855839,
+    "reject_H0": false
+  },
+  "H2": {
+    "n_lnB_gt3": 0,
+    "n_bh": 0,
+    "survivors": [],
+    "ephemeris_specific": [],
+    "h4": {}
+  },
+  "H3": {
+    "f_median": 0.02127347286617602,
+    "f_upper95": 0.08576988491889073
+  }
+}

@@ -1,42 +1,94 @@
 sample       status
-Charisi2016  scored    31
+Charisi2016  scored    33
+Graham2015   scored    34
 dtype: int64
 {
  "H1": {
-  "n_testable": 30,
-  "k": 2,
+  "n_testable": 62,
+  "k": 3,
   "rate": 0.05,
-  "expected": 1.5,
-  "p_binom": 0.44645792456821287,
+  "expected": 3.1,
+  "p_binom": 0.6049514736868871,
   "reject_H0": false
  },
  "H2": {
   "n_lnB_gt3": 0,
   "n_bh": 0,
   "survivors": [],
+  "ephemeris_specific": [],
   "h4": {}
  },
  "H3": {
-  "f_median": 0.02627471422606883,
-  "f_upper95": 0.10642822868756506
+  "f_median": 0.0127855812389483,
+  "f_upper95": 0.052030983690971706
  }
 }
 sample       status
-Charisi2016  scored    31
+Charisi2016  scored    33
+Graham2015   scored    34
 dtype: int64
 {
  "H1": {
-  "n_testable": 30,
-  "k": 23,
+  "n_testable": 62,
+  "k": 46,
   "rate": 0.05,
-  "expected": 1.5,
-  "p_binom": 1.7211169122375742e-24,
+  "expected": 3.1,
+  "p_binom": 1.7407845488113437e-46,
   "reject_H0": true
  },
  "H2": {
-  "n_lnB_gt3": 19,
-  "n_bh": 22,
+  "n_lnB_gt3": 38,
+  "n_bh": 44,
   "survivors": [
+   "G15_001",
+   "G15_003",
+   "G15_006",
+   "G15_007",
+   "G15_010",
+   "G15_013",
+   "G15_018",
+   "G15_034",
+   "G15_038",
+   "G15_040",
+   "G15_042",
+   "G15_051",
+   "G15_087",
+   "G15_101",
+   "G15_106",
+   "G15_107",
+   "G15_109",
+   "C16_001",
+   "C16_002",
+   "C16_003",
+   "C16_009",
+   "C16_010",
+   "C16_011",
+   "C16_014",
+   "C16_016",
+   "C16_021",
+   "C16_029",
+   "C16_030",
+   "C16_031",
+   "C16_034",
+   "C16_036",
+   "C16_039",
+   "C16_041",
+   "C16_042",
+   "C16_043",
+   "C16_044",
+   "C16_048",
+   "C16_050"
+  ],
+  "ephemeris_specific": [
+   "G15_001",
+   "G15_003",
+   "G15_006",
+   "G15_013",
+   "G15_042",
+   "G15_051",
+   "G15_087",
+   "G15_101",
+   "G15_106",
    "C16_003",
    "C16_016",
    "C16_029",
@@ -46,126 +98,124 @@ dtype: int64
    "C16_044"
   ],
   "h4": {
-   "C16_001": {
-    "lnB": 24.256723684148277,
-    "frac_scrambled_below": 0.945,
-    "passes": false,
-    "lnB_period": {
-     "0.9": -9.90265264686408,
-     "1.1": -15.763874714717552
-    }
-   },
-   "C16_002": {
-    "lnB": 4.577459987643856,
-    "frac_scrambled_below": 0.77,
-    "passes": false,
-    "lnB_period": {
-     "0.9": 2.6303012944078894,
-     "1.1": 1.9408877538381333
-    }
-   },
-   "C16_003": {
-    "lnB": 48.744174358823244,
-    "frac_scrambled_below": 0.995,
+   "G15_001": {
+    "lnB": 3.8062596910173596,
+    "frac_scrambled_below": 0.99,
     "passes": true,
     "lnB_period": {
-     "0.9": 13.616086157108288,
-     "1.1": 2.340632025243764
+     "0.9": 1.7408549908863122,
+     "1.1": 1.4462970279445884
     }
    },
-   "C16_009": {
-    "lnB": 7.04920368208413,
-    "frac_scrambled_below": 0.855,
-    "passes": false,
-    "lnB_period": {
-     "0.9": 0.6038391070119928,
-     "1.1": 2.2995642935107288
-    }
-   },
-   "C16_010": {
-    "lnB": 17.45513462270285,
-    "frac_scrambled_below": 0.945,
-    "passes": false,
-    "lnB_period": {
-     "0.9": 0.81415115634017,
-     "1.1": -1.1010126830698193
-    }
-   },
-   "C16_011": {
-    "lnB": 3.576924537187266,
-    "frac_scrambled_below": 0.865,
-    "passes": false,
-    "lnB_period": {
-     "0.9": -1.7936131112507354,
-     "1.1": -0.4665638374189687
-    }
-   },
-   "C16_014": {
-    "lnB": 4.257972443984556,
-    "frac_scrambled_below": 0.945,
-    "passes": false,
-    "lnB_period": {
-     "0.9": -6.115503763273686,
-     "1.1": -4.182434136111709
-    }
-   },
-   "C16_016": {
-    "lnB": 49.55253970625159,
-    "frac_scrambled_below": 0.995,
-    "passes": true,
-    "lnB_period": {
-     "0.9": -6.725935550917773,
-     "1.1": -0.9926399095204754
-    }
-   },
-   "C16_021": {
-    "lnB": 10.546282376259981,
-    "frac_scrambled_below": 0.77,
-    "passes": false,
-    "lnB_period": {
-     "0.9": -0.14753495790184346,
-     "1.1": -2.5448725676726944
-    }
-   },
-   "C16_029": {
-    "lnB": 24.27801253039738,
-    "frac_scrambled_below": 0.98,
-    "passes": true,
-    "lnB_period": {
-     "0.9": -0.15250256286565644,
-     "1.1": 4.056354323170925
-    }
-   },
-   "C16_030": {
-    "lnB": 7.667280683607897,
-    "frac_scrambled_below": 0.945,
-    "passes": false,
-    "lnB_period": {
-     "0.9": -1.7276830785987034,
-     "1.1": -4.512291923418284
-    }
-   },
-   "C16_031": {
-    "lnB": 11.684919168926598,
-    "frac_scrambled_below": 0.96,
-    "passes": true,
-    "lnB_period": {
-     "0.9": -2.640757042037282,
-     "1.1": -9.547522201751631
-    }
-   },
-   "C16_034": {
-    "lnB": 5.683598518591236,
+   "G15_003": {
+    "lnB": 8.998722008799888,
     "frac_scrambled_below": 0.97,
     "passes": true,
     "lnB_period": {
-     "0.9": 1.7643433620406306,
-     "1.1": -0.5816679998306924
+     "0.9": 4.055438341796872,
+     "1.1": 5.156261572598787
     }
    },
-   "C16_036": {
-    "lnB": 6.72611855904996,
-    "frac_scrambled_below": 0.885,
+   "G15_006": {
+    "lnB": 5.3024265092998455,
+    "frac_scrambled_below": 0.98,
+    "passes": true,
+    "lnB_period": {
+     "0.9": -3.190296623443505,
+     "1.1": -0.9571502723404635
+    }
+   },
+   "G15_007": {
+    "lnB": 5.4965846748171,
+    "frac_scrambled_below": 0.805,
     "passes": false,
     "lnB_period": {
-     "0.9
+     "0.9": -3.7143788775776017,
+     "1.1": 5.879148714193327
+    }
+   },
+   "G15_010": {
+    "lnB": 4.901242533432814,
+    "frac_scrambled_below": 0.82,
+    "passes": false,
+    "lnB_period": {
+     "0.9": -12.9749812608937,
+     "1.1": 4.248992079946667
+    }
+   },
+   "G15_013": {
+    "lnB": 8.186567082897746,
+    "frac_scrambled_below": 0.985,
+    "passes": true,
+    "lnB_period": {
+     "0.9": -6.651451691730056,
+     "1.1": -6.947591833872261
+    }
+   },
+   "G15_018": {
+    "lnB": 3.1219478716166833,
+    "frac_scrambled_below": 0.945,
+    "passes": false,
+    "lnB_period": {
+     "0.9": 0.17492930320148048,
+     "1.1": -0.18109515822251865
+    }
+   },
+   "G15_034": {
+    "lnB": 3.459798586696877,
+    "frac_scrambled_below": 0.835,
+    "passes": false,
+    "lnB_period": {
+     "0.9": -1.3729642506354587,
+     "1.1": 4.494072926463858
+    }
+   },
+   "G15_038": {
+    "lnB": 3.9489702872693258,
+    "frac_scrambled_below": 0.945,
+    "passes": false,
+    "lnB_period": {
+     "0.9": -1.2634116159768567,
+     "1.1": 0.5405502214153444
+    }
+   },
+   "G15_040": {
+    "lnB": 4.6969463686905435,
+    "frac_scrambled_below": 0.93,
+    "passes": false,
+    "lnB_period": {
+     "0.9": -2.7374954727577396,
+     "1.1": -2.3322551433302507
+    }
+   },
+   "G15_042": {
+    "lnB": 8.9341311
+sample       status
+Charisi2016  scored    33
+Graham2015   scored    34
+dtype: int64
+{
+ "H1": {
+  "n_testable": 45,
+  "k": 2,
+  "rate": 0.05,
+  "expected": 2.25,
+  "p_binom": 0.6650433448855839,
+  "reject_H0": false
+ },
+ "H2": {
+  "n_lnB_gt3": 0,
+  "n_bh": 0,
+  "survivors": [],
+  "ephemeris_specific": [],
+  "h4": {}
+ },
+ "H3": {
+  "f_median": 0.02127347286617602,
+  "f_upper95": 0.08576988491889073
+ }
+}
+{"median": 0.0127855812389483, "upper95": 0.052030983690971706}
+{"median": 0.9401210338264668, "upper95": 0.9880775690687843}
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+wrote /Users/berkh/Desktop/gaia-dr4-periodic-quasars/notebooks/01_sample.ipynb
