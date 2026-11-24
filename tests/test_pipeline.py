@@ -65,3 +65,22 @@ def test_clean_dr4_epochs_on_mock_table():
     assert np.all(np.diff(T) > 1.0)
     assert abs(np.median(Y) - 19.0) < 0.02
     assert T.min() > 56863 - 1 and T.max() < 58870
+
+
+def test_periodogram_matches_direct_evidence():
+    import simulate_null as SN
+    rng = np.random.default_rng(4)
+    t = np.sort(rng.uniform(53500, 56500, 120)); e = np.full(120, 0.05)
+    sv = (t > 55000).astype(int)
+    hD = M.Hyper(sigma=0.2, tau=300.0, jitter=0.02)
+    hS = M.Hyper(sigma=0.15, tau=250.0, jitter=0.01, sigma_s=0.12, period=900.0)
+    periods = np.array([800.0, 900.0, 1000.0])
+    pg = SN.Periodogram(t, e, sv, 2, hS, hD, periods)
+    Y = 18 + rng.standard_normal((120, 3)) * 0.2
+    dz = pg.dlnZ(Y)
+    for b in range(3):
+        lc = M.LightCurve(t, Y[:, b], e, sv)
+        for k, P in enumerate(periods):
+            ref = (M.log_evidence(lc, hS.sigma, hS.tau, hS.jitter, P, hS.sigma_s)
+                   - M.log_evidence(lc, hD.sigma, hD.tau, hD.jitter))
+            assert np.isclose(dz[k, b], ref, atol=1e-6)

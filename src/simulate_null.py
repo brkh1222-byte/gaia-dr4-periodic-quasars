@@ -14,7 +14,8 @@ and published period P_i) and a mock Gaia DR4 cadence in the candidate's test wi
      candidate's model-D fit); Gaia data get nuisance draws s ~ LogN(0,0.35),
      j ~ HalfN(0.05), c ~ N(0, 0.3^2);
   2. selection: GP periodogram  dlnZ(P) = ln Z_S(P) - ln Z_D  on 41 log-spaced periods in
-     [0.8 P_i, 1.25 P_i]; accept if max dlnZ >= dlnZ of the real candidate at P_i
+     [0.8 P_i, 1.25 P_i]; the maximum must be interior to the grid (a genuine peak inside the
+     window); accept if max dlnZ >= dlnZ of the real candidate at P_i
      (the fake looks at least as periodic as the real one, at a similar period).
      If fewer than K fakes are accepted in N_TRIALS_MAX trials, the K with the largest
      dlnZ are used and the template is flagged 'relaxed';
@@ -25,7 +26,7 @@ Optionally (--psd dho) the fakes are generated from a steeper damped-harmonic-os
 (CARMA(2,1)) process instead of a DRW, for the pre-registered sensitivity analysis.
 
 Usage:
-  .venv/bin/python src/simulate_null.py --k 50 --workers 2 [--templates CH001,GR005] [--psd dho]
+  .venv/bin/python src/simulate_null.py --k 200 --workers 2 [--templates CH001,GR005] [--psd dho]
 """
 from __future__ import annotations
 
@@ -132,10 +133,12 @@ def run_template(row, lc, hypS, hypD, t_g, e_g, k, rng, psd="drw"):
         dz = pg.dlnZ(Yo)
         ib = np.argmax(dz, axis=0)
         best = dz[ib, np.arange(BATCH)]
+        interior = (ib > 0) & (ib < N_GRID - 1)        # a real peak inside the window
+        best = np.where(interior, best, -np.inf)
         for b in np.where(best >= dz_real)[0]:
             acc_x.append((X[b], Yo[:, b].copy())); acc_dz.append(best[b]); acc_P.append(periods[ib[b]])
         top = np.argsort(best)[-k:]
-        pool += [(best[b], periods[ib[b]], (X[b], Yo[:, b].copy())) for b in top]
+        pool += [(best[b], periods[ib[b]], (X[b], Yo[:, b].copy())) for b in top if np.isfinite(best[b])]
         pool = sorted(pool, key=lambda z: -z[0])[:k]
         n_trials += BATCH
     relaxed = len(acc_x) < k
@@ -174,7 +177,7 @@ def _template_job(args):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--k", type=int, default=50)
+    ap.add_argument("--k", type=int, default=200)
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--templates", default="")
     ap.add_argument("--psd", default="drw", choices=["drw", "dho"])
