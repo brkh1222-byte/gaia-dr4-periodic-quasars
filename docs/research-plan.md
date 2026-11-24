@@ -2,11 +2,18 @@
 
 Mirror of the Claude Doc https://claude.ai/artifact/XLmjm3H9pSoC948ju4T5xq (as of 2026-11-24). The doc is the working copy; this file is updated as sections are completed.
 
-> Sections marked _(in progress)_ are not yet written.
-
 ## Summary
 
-_(in progress)_
+**The project is still novel and worth doing, but it needs four fixes before the pre-registration is frozen on 1 Dec.** No published or announced work tests fixed published periodic-quasar ephemerides against Gaia photometry, and no sample-level pre-registration exists in this field. The closest work runs the other way: El-Badry, Hogg & Rix (2026) used Gaia DR3 sinusoids to predict ZTF, and Foustoul et al. (2025) refitted CRTS candidates with ZTF. Both found that nearly all candidates fail, so the expected result is negative. The plan turns that into a number: an upper limit on the fraction of true periodic sources.
+
+The four fixes:
+
+1. **Ephemerides are mostly not published.** Graham 2015 gives periods only. Phase and amplitude must come from a pre-registered fit to pre-cut-off data.
+2. **The window is not fully blind.** Gaia DR3 (to May 2017), CRTS (to mid-2016) and iPTF (to 2017) overlap it. Add per-candidate cut-offs and a DR3 non-inspection rule.
+3. **Statistics need calibration.** Use simulations that reproduce the discovery selection, with a power-based testability cut, rather than fixed Bayes-factor thresholds.
+4. **The proposal has citation errors.** Two are major: the Huijse et al. and arXiv:2004.10944 descriptions. Five are minor (A.6).
+
+The target is an RNAAS note around 21 Dec 2026, then a full paper with the mentor if results warrant.
 
 # Part A — What we're studying
 
@@ -350,8 +357,68 @@ Figures for the full paper:
 
 ## B.6 Timeline and risks
 
-_(in progress)_
+**Four weeks in total: 7 days to freeze the pre-registration (the hard gate), then ~3 weeks from release to an RNAAS submission around 21 Dec.** The first week is the tightest. If time runs short, cut scope (Tier A only, fewer simulations per candidate), never the deadline.
+
+The doc draws this as a timeline. Everything up to and including the freeze must be committed, tagged and archived before release; everything after runs on real DR4 data.
+
+| Dates (2026) | Step |
+| --- | --- |
+| 24–25 Nov | Compile candidates |
+| 25–27 Nov | Get CRTS/PTF data |
+| 26–28 Nov | Models + scoring code |
+| 28–30 Nov | Null + injection sims |
+| 30 Nov – 1 Dec | Write pre-registration |
+| **1 Dec** | **Freeze: push + Zenodo (hard gate)** |
+| 2 Dec | Gaia DR4 release |
+| 2–5 Dec | Cross-match + download |
+| 6–10 Dec | Score, tests, controls |
+| 11–14 Dec | Figures + mentor review |
+| 15–21 Dec | Write + submit RNAAS |
+
+**Main risks.**
+
+| Risk | Likelihood | Mitigation |
+| --- | --- | --- |
+| Pre-registration not ready by 1 Dec | High | Freeze Tier A only; drop Tier B rather than freezing it late. A simple, complete pre-registration beats an ambitious, late one. |
+| Phases and amplitudes not published | Certain | Pre-registered "derived ephemeris" procedure (B.2), with provenance for every row. |
+| CRTS server slow or down (HTTP-only, legacy) | Medium | Download all Tier A light curves on 24–25 Nov. Store raw files with SHA-256 hashes. Charisi's data also exist via IRSA. |
+| DR4 archive congestion in release week | High | Scripts tested on DR3 *non-candidate* sources beforehand. Batches ≤ 5,000 IDs, retries, caching; ESA bulk download as fallback. |
+| Final DR4 data model differs from the draft | Medium | Rules written as intent with fallbacks. Any needed change becomes a dated amendment, made before scoring. |
+| Too few testable candidates | Medium | The power map is itself a reportable result (B.4, null outcome). |
+| Accidental unblinding (DR3, post-cut-off CRTS/iPTF/ZTF) | Low | Written rule in the pre-registration, a data-access log, and code that never queries DR3 epoch photometry for candidates. |
+| DRW null too lenient | Medium | Pre-registered damped-harmonic-oscillator sensitivity analysis; headline result checked under both nulls. |
+| Scoop by a fast DR4 periodicity search | Low–medium | Zenodo DOI timestamp; a different question (published ephemerides); fast RNAAS. |
+| Mentor unavailable for review or arXiv endorsement | Unknown | Send the pre-registration draft by 29 Nov; agree the endorsement now. |
 
 ## Suggested changes to PROPOSAL.md / TASKS.md
 
-_(in progress)_
+The first five PROPOSAL.md items fix factual errors and should land before any pre-registration text is written. The TASKS.md items add the steps the refined design needs before 1 Dec.
+
+**PROPOSAL.md**
+
+- [ ] §1 and §3: rewrite the Huijse et al. entry. v2 finds no reliable candidates (13 sources, consistent with false positives). Remove "plan a blind DR4 periodicity search". Cite A&A 715, A92 (2026).
+- [ ] §3 table: replace "Red-noise critiques (2004.10944)" with Foustoul 2025 (Graham sample vs ZTF) and Robnik et al. 2024 (Charisi sample). arXiv:2004.10944 is Zhu & Thrane 2020, about PG 1302-102 only.
+- [ ] §3 and §11: Chen → Y.-J. Chen et al. 2024, MNRAS 527, 12154; "3 of 86 survive extended baselines". Lin et al. → 2026, ApJ 997, 316. Add journals for Foustoul (A&A 699, A55), El-Badry (PASP 138, 024102) and Liu 2016 (ApJ 833, 6), and the arXiv ID for Vaughan (1606.02620).
+- [ ] §1: "epoch photometry for about 2 billion sources" → "for all ~2.8 billion processed sources".
+- [ ] §1 and §3: qualify "out-of-sample for every CRTS- and PTF-era candidate". CRTS (CSDR3) runs to mid-2016, iPTF to Feb 2017, and Gaia DR3 published epoch photometry for Jul 2014 – May 2017. Add per-candidate cut-offs and an explicit DR3 non-inspection statement.
+- [ ] §2: cite NANOGrav 15-yr (Agazie et al. 2023, ApJL 951, L8) and Sesana et al. 2018 (ApJ 856, 42).
+- [ ] §4: replace H0/H1 with H0–H4 from B.1, including the binary fraction f and the testability cut.
+- [ ] §6 step 1: say the ephemeris = published period + phase and amplitude *derived* by a pre-registered fit. Graham 2015 publishes periods only. This keeps the "never invent ephemeris values" rule honest.
+- [ ] §6 steps 2–8: use a proper, identical offset prior in both models. Marginalise DRW hyperparameters. Make null simulations reproduce the discovery selection; add injections and a damped-harmonic-oscillator sensitivity null.
+- [ ] §6 step 4: add tag `prereg-v1` + Zenodo/OSF archive for an independent timestamp, and a data-access statement.
+- [ ] §5: CRTS access is via the CSDR3 cone search (catalinadata.org no longer resolves). Mark `data_release='Gaia DR4'` as "confirm on release day".
+- [ ] §8: confirm the current RNAAS word and figure limits on the AAS guidelines page.
+
+**TASKS.md**
+
+- [ ] T1.1: add columns `tier`, `cutoff_mjd`, `period_frame`, `phase_source` (published/derived) and `amplitude_source`. Add a tested-by flag for Robnik 2024. Move Foustoul's 221 weaker candidates to Tier C. Drop Gaia DR3-selected candidates.
+- [ ] T1.2: download CRTS/PTF **now** and truncate at each cut-off on download. Defer all ZTF downloads until after the pre-registration commit, so later data cannot influence choices.
+- [ ] New T1.4: derive phase and amplitude (period fixed) from pre-cut-off data; store posterior samples with provenance.
+- [ ] T2.1: marginalise (σ, τ); save predictions on a daily 2014–2020 grid.
+- [ ] T2.2: closed-form offset marginalisation, G/V amplitude-ratio grid, Gaia jitter; identical priors in both models.
+- [ ] T2.3: null simulations that reproduce the discovery selection, injections, the testability cut, and a damped-harmonic-oscillator null.
+- [ ] New T2.5: dress rehearsal on mock DR4 files; test the DataLink download script on DR3 *non-candidate* sources.
+- [ ] T2.4: add the tag, Zenodo DOI and data-access/DR3 non-inspection statement. Send the draft to the mentor by 29 Nov.
+- [ ] T3.1–T3.2: implement the B.2 Gaia rules: G only, 1-day binning, `spurious_signal` flag, faint flag, ≥ 10 binned epochs.
+- [ ] T3.3: add H4 phase scrambling, the negative (swapped-ephemeris) and positive (injection) controls, and the DR4-new-interval sensitivity run.
+- [ ] T4.1: arrange arXiv endorsement with the mentor; add an AI-tools disclosure to the acknowledgements.
