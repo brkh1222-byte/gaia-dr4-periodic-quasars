@@ -168,13 +168,65 @@ Three changes sharpen the proposal's question:
 
 _(in progress)_
 
-## B.3 Analysis plan
+## B.3 Analysis plan: statistics, controls, decision rules
 
-_(in progress)_
+Every candidate gets one number, the predictive log Bayes factor lnB. Simulations, not textbook thresholds, decide what that number means. All rules below are frozen in the pre-registration.
+
+**1. Per-candidate score.** Let D_old be the discovery data and D_new the Gaia epochs after that candidate's cut-off. Each model is conditioned on D_old and asked how probable D_new was:
+
+```latex
+\ln B = \ln p(D_\text{new} \mid D_\text{old}, \mathcal{M}_\text{sin+DRW}) - \ln p(D_\text{new} \mid D_\text{old}, \mathcal{M}_\text{DRW})
+```
+
+Both predictive densities are Gaussian-process conditionals computed with celerite2. lnB > 0 means the sinusoid predicted Gaia better. Nuisance parameters are fixed in advance and marginalised the same way in both models:
+
+- a Gaia–survey magnitude offset (analytic, broad Gaussian prior);
+- a band amplitude ratio G/V (grid over a pre-set log-normal prior);
+- a Gaia white-noise jitter (grid, prior centred on Gaia's documented per-transit precision at the candidate's G magnitude, fixed before release).
+
+**2. Null calibration (what lnB looks like if the candidate is red noise).** For each candidate, simulate 1,000 DRW light curves using its own discovery cadence, errors and fitted DRW parameters. Keep only the simulations that pass a simplified copy of the discovery selection: periodogram peak in the searched range, at least 1.5 cycles, and amplitude at least as large as published. Fit their "ephemerides", extend each light curve onto Gaia's cadence and noise, and score them. This gives a null distribution and a p-value pᵢ for every candidate.
+
+**3. Injection (what lnB looks like if the candidate is real).** Simulate the published sinusoid plus DRW on the same cadences and score it. This gives the signal distribution and each candidate's power.
+
+**4. Testability cut (decided before release).** A candidate is *testable* if injected signals exceed the threshold (lnB > 3) in at least 80% of simulations. Untestable candidates are listed and excluded from H1–H3.
+
+**5. Pre-registered tests.**
+
+| Hypothesis | Statistic | Decision rule |
+| --- | --- | --- |
+| H1 population excess | k = number of testable candidates with pᵢ < 0.05 | Reject H0 if the one-sided binomial p (n, 0.05) < 0.01 |
+| H2 individual survivors | pᵢ for each testable candidate | Survivor if lnB > 3 and Benjamini–Hochberg q < 0.05 |
+| H3 binary fraction f | Likelihood ∏ᵢ [f·p_inj,ᵢ(lnBᵢ) + (1−f)·p_null,ᵢ(lnBᵢ)], flat prior on f | Report posterior median and 95% upper limit |
+| H4 ephemeris specificity | lnB with published phase vs 200 random phases, and period ±10% | A survivor counts only if its published-phase lnB beats 95% of scrambled versions |
+
+**6. Controls.**
+
+- **Phase scrambling and period perturbation** (H4) show whether the specific published ephemeris matters, rather than any wave.
+- **Negative control:** swap ephemerides between candidates at random. The H1 count should fall to the null rate.
+- **Positive control:** inject fake binaries into the real Gaia cadence of non-candidate quasars. The pipeline must recover them at the rate step 3 predicts.
+- **Dress rehearsal:** run the whole pipeline end to end on mock DR4 files before release. Freeze the code by commit hash.
+
+**7. Pre-registered sensitivity analyses (reported, not used for the headline).**
+
+- A steeper-spectrum null (CARMA(2,1)/damped harmonic oscillator) instead of the DRW.
+- Only the DR4-new interval (after DR3's May 2017 end).
+- Unbinned versus visit-binned Gaia data.
+- A wider amplitude-ratio prior.
+- A quasi-periodic variant allowing slow phase drift.
+
+**8. Exploratory (labelled as such in the paper).** Joint CRTS + Gaia + ZTF fits for any survivors. Comparison with Foustoul's ZTF verdicts for the same objects.
 
 ## B.4 Positive, negative and null results
 
-_(in progress)_
+All three outcomes are publishable, because the pre-registration and the power analysis are fixed before we see the data. A reader can trust a "no" as much as a "yes".
+
+| Outcome | What we would see | What it means | Why it is publishable |
+| --- | --- | --- | --- |
+| **Positive** | H1 rejects the null (binomial p < 0.01), or at least one H2 survivor passes the H4 specificity check | Some published ephemerides correctly predicted 2014–2020 Gaia data they never saw | First pre-registered, out-of-sample confirmation of SMBHB ephemerides. Survivors become top targets for spectroscopy, pulsar-timing searches and Rubin/LSST monitoring. A strong RNAAS note, likely followed by an ApJ/MNRAS paper with the mentor. |
+| **Negative** | Testable candidates' lnB values match the null, and the H3 upper limit on f is well below 1 | The ephemerides have no predictive power beyond red noise | Converts a qualitative "probably red noise" into a number (f < X at 95%) from independent data. Adds an independent instrument and the 2014–2018 gap to Foustoul's and El-Badry's results. Directly relevant to the debate over whether candidates fit the PTA background. |
+| **Null / inconclusive** | Too few candidates are testable, or the H3 posterior on f stays broad | Gaia's cadence and depth cannot decide for these candidates | Still a useful methods note: a public, pre-registered pipeline and a power map of which candidate types Gaia can test. The frozen predictions can be re-scored against Rubin/LSST or later Gaia releases. Weaker; RNAAS-sized. |
+
+**Guard against spin.** The headline is the pre-registered population result (H1 and H3). Individual survivors are reported with their q-values and H4 outcome, never as "confirmed binaries". Sensitivity and exploratory results are labelled as such. Any deviation from the plan goes into a dated amendment that explains why.
 
 ## B.5 Paper outline, figures and target journal
 
