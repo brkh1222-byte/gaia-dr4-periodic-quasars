@@ -45,24 +45,48 @@ def _retry(fn, tries=4, wait=10):
     raise err
 
 
-def get_crts(ra, dec):
-    def call():
-        data = {"RADec": f"{ra:.6f} {dec:+.6f}", "Rad": "0.1", "IMG": "nun", "DB": "photcat",
-                "OUT": "csv", "SHORT": "short", ".submit": "Submit"}
-        files = {k: (None, v) for k, v in data.items()}   # multipart/form-data
-        r = requests.post(CRTS_URL, files=files, headers=UA, timeout=180)
-        r.raise_for_status()
-        m = re.search(r"(http://nunuku\.caltech\.edu/DataRelease/upload/[^\"'<> ]+\.csv)", r.text)
-        if m is None:
-            if re.search(r"no (objects|sources|data)|not found|0 objects", r.text, re.I):
-                return pd.DataFrame()
-            raise RuntimeError("CRTS: no CSV link in response")
-        c = requests.get(m.group(1), headers=UA, timeout=180)
-        c.raise_for_status()
-        if not c.text.strip():
-            return pd.DataFrame()
-        return pd.read_csv(io.StringIO(c.text))
-    return _retry(call)
+CRTS_NAME_URL = "http://nunuku.caltech.edu/cgi-bin/getcssconedbid_release2.cgi"
+
+
+def _crts_post(url, data, timeout=90):
+    files = {k: (None, v) for k, v in data.items()}   # multipart/form-data
+    r = requests.post(url, files=files, headers=UA, timeout=timeout)
+    r.raise_for_status()
+    m = re.search(r"(http://nunuku\.caltech\.edu/DataRelease/upload/[^\"'<> ]+\.csv)", r.text)
+    if m is None:
+        if re.search(r"There were 0 lines|no (objects|sources) found", r.text, re.I):
+            return pd.DataFrame()          # genuine empty result
+        raise RuntimeError("CRTS: no CSV link in response (service failure)")
+    c = requests.get(m.group(1), headers=UA, timeout=timeout)
+    c.raise_for_status()
+    return pd.read_csv(io.StringIO(c.text)) if c.text.strip() else pd.DataFrame()
+
+
+def get_crts(ra, dec, name=None, tries=2):
+    """Cone search (0.1'); if the service fails, the name search (Sesame) as fallback.
+
+    The CRTS position search has been intermittent since 2026-11-24; failures raise so the
+    object is retried in a later pass.
+    """
+    last = None
+    for _ in range(tries):
+        try:
+            return _crts_post(CRTS_URL, {"RADec": f"{ra:.6f} {dec:+.6f}", "Rad": "0.1",
+                                         "IMG": "nun", "DB": "photcat", "OUT": "csv",
+                                         "SHORT": "short", ".submit": "Submit"})
+        except Exception as e:
+            last = e
+        if name:
+            try:
+                df = _crts_post(CRTS_NAME_URL, {"Name": name, "Rad": "0.1", "DB": "photcat",
+                                                "OUT": "csv", "SHORT": "short", ".submit": "Submit"})
+                if len(df):
+                    df["query"] = f"name:{name}"
+                return df
+            except Exception as e:
+                last = e
+        time.sleep(20)
+    raise last
 
 
 def get_ptf(ra, dec, service=None):
@@ -90,20 +114,8 @@ def main():
     ap.add_argument("--samples", default="")
     ap.add_argument("--shard", default="0/1", help="k/n: process every n-th candidate starting at k")
     ap.add_argument("--wait-hours", type=float, default=0.0,
-                    help="CRTS only: probe the server every 15 min for up to this long")
+                    help="keep making passes over failed objects for up to this long")
     a = ap.parse_args()
-    if a.survey == "crts" and a.wait_hours > 0:
-        t_end = time.time() + 3600 * a.wait_hours
-        while True:
-            try:
-                if len(get_crts(196.3875, -10.5553)) > 0:   # PG 1302-102 probe
-                    print("CRTS server responding", flush=True)
-                    break
-            except Exception as e:
-                print("CRTS probe failed:", str(e)[:80], pd.Timestamp.now("UTC"), flush=True)
-            if time.time() > t_end:
-                sys.exit("CRTS server still down; giving up")
-            time.sleep(900)
     cand = pd.read_csv(C.CANDIDATES_CSV)
     if a.samples:
         cand = cand[cand["sample"].isin(a.samples.split(","))]
@@ -121,6 +133,21 @@ def main():
     if a.survey == "ptf":
         import pyvo
         svc = pyvo.dal.TAPService(IRSA_TAP)
+    t_end = time.time() + 3600 * a.wait_hours
+    passes = 0
+    while True:
+        passes += 1
+        n_fail = _one_pass(a, cand, outdir, logf, log, done, svc)
+        log = pd.read_csv(logf) if logf.exists() else log
+        done |= set(log["cand_id"])
+        print(f"pass {passes}: {n_fail} failures", flush=True)
+        if n_fail == 0 or time.time() > t_end:
+            break
+        time.sleep(600)
+
+
+def _one_pass(a, cand, outdir, logf, log, done, svc):
+    n_fail = 0
     for k, (_, r) in enumerate(cand.iterrows()):
         cid = r["cand_id"]
         if cid in done:
@@ -128,7 +155,8 @@ def main():
         t0 = time.time()
         try:
             if a.survey == "crts":
-                df = get_crts(r["ra_use"], r["dec_use"])
+                nm = r["name"] if not str(r["name"]).startswith("ZTF oid") else None
+                df = get_crts(r["ra_use"], r["dec_use"], nm)
             elif a.survey == "ptf":
                 df = get_ptf(r["ra_use"], r["dec_use"], svc)
             else:
@@ -141,11 +169,14 @@ def main():
         rec = dict(cand_id=cid, n_rows=len(df), status=status,
                    retrieved_utc=pd.Timestamp.now("UTC").isoformat(timespec="seconds"),
                    seconds=round(time.time() - t0, 1))
-        if status == "ok":          # failed queries are retried on the next run
+        if status == "ok":          # failed queries are retried in the next pass
             log = pd.concat([log, pd.DataFrame([rec])], ignore_index=True)
             log.to_csv(logf, index=False)
+        else:
+            n_fail += 1
         print(f"[{k+1}/{len(cand)}] {cid} {status} n={len(df)}", flush=True)
         time.sleep(1.0)
+    return n_fail
 
 
 if __name__ == "__main__":
