@@ -79,9 +79,12 @@ from discovery data obtained before the paper's arXiv v1 submission date (the GP
 described below). These values were frozen before any DR4 data existed. The test is thus a
 test of the published period together with the phase implied by the discovery data.
 
-\textit{Data.} Discovery light curves are CRTS (Catalina Surveys data release; unfiltered,
-V-calibrated) for the Graham sample and PTF/iPTF Mould-$R$ \citep[IRSA;][]{Law2009} for the
-Charisi sample, binned by night. For each candidate, the Gaia test epochs are the DR4 G-band
+\textit{Data.} Discovery light curves are CRTS (Catalina Sky Survey photometry from the
+Catalina Surveys data release; unfiltered, V-calibrated) for the Graham sample and PTF/iPTF
+Mould-$R$ \citep[IRSA;][]{Law2009} for the Charisi sample, binned by night. The CRTS service was
+intermittent in November 2026; Graham candidates whose CRTS light curve could not be retrieved
+before the freeze are conditioned on PTF/iPTF data before the cutoff instead and reported
+separately (\pending{number}). For each candidate, the Gaia test epochs are the DR4 G-band
 field-of-view transits after the arXiv v1 date of the source paper (2015 July 27 and 2016
 April 4), binned into visits of $\leq$1\,d. Candidates must have Gaia DR3 mean $G<20.7$.
 Nobody on the project inspected Gaia DR3 epoch photometry, which covers the first 34
