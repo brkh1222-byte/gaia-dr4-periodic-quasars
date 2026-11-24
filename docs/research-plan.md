@@ -230,7 +230,47 @@ All three outcomes are publishable, because the pre-registration and the power a
 
 ## B.5 Paper outline, figures and target journal
 
-_(in progress)_
+**Target: a Research Note of the AAS (RNAAS) within ~3 weeks of DR4, then a full paper with the mentor if the results justify it.** RNAAS is fast and suits a timely, narrowly scoped result. Per the [AAS Research Note guidelines](https://journals.aas.org/research-note-preparation-guidelines), a note has a strict word cap that counts title, captions and references, and allows one figure *or* one table. A search summary gave the cap as 1,500 words; confirm the current limit on that page before drafting.
+
+**RNAAS note (~one page).**
+
+| Section | Content | Approx. words |
+| --- | --- | --- |
+| Title | e.g. "A pre-registered Gaia DR4 test of published periodic-quasar ephemerides" | – |
+| Abstract | Question, sample size, headline (H1 result and f limit) | ~120 |
+| Introduction | SMBHBs and the PTA background; red-noise false positives; why Gaia 2014–2020 is out-of-sample | ~200 |
+| Pre-registration and data | Repository and Zenodo DOI with timestamp; catalogues; cut-offs; testability cut; DR3 non-inspection statement | ~250 |
+| Method | Predictive lnB; null and injection simulations; decision rules | ~250 |
+| Results | n testable; H1 count vs expected; survivors with q and H4; f posterior | ~250 |
+| Discussion | Comparison with Foustoul 2025 and El-Badry 2026; PTA implications; limits (sinusoid-only, sparse cadence); Rubin | ~200 |
+| References | Verified list (Part A.6) | counted |
+
+**The one figure (two panels).**
+
+- *Left:* the distribution of lnB for testable candidates against the stacked null and injection distributions from simulations.
+- *Right:* the posterior on the binary fraction f, with the 95% upper limit marked.
+
+**Full paper (if warranted), ApJ or MNRAS with the mentor.**
+
+1. Introduction
+2. Candidate catalogues and provenance (full table with source of every row)
+3. Data: CRTS/PTF discovery data, Gaia DR4 epoch photometry, quality cuts
+4. Method: models, scoring, simulations, testability
+5. Results: population tests, survivors, controls
+6. Sensitivity analyses and deviations from the pre-registration
+7. Discussion: physics of survivors, PTA consistency, quasi-periodic binaries
+8. Conclusions; Appendix: frozen pre-registration
+
+Figures for the full paper:
+
+- Sample map: period vs G magnitude, testable candidates marked.
+- Three or four example light curves (CRTS + Gaia + ZTF) with both models' predictions and 1σ bands.
+- lnB vs null and injection (as in the note).
+- f posterior.
+- H4 phase-scrambling histograms for survivors.
+- Sensitivity summary table.
+
+**Practicalities.** arXiv submission (astro-ph.GA) needs the mentor's endorsement for a first-time submitter. Ask the mentor about publication charges and who covers them. List AI-assisted tools in the acknowledgements.
 
 ## B.6 Timeline and risks
 
