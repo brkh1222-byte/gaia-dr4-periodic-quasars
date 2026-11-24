@@ -99,7 +99,7 @@ def main():
                     print("CRTS server responding", flush=True)
                     break
             except Exception as e:
-                print("CRTS probe failed:", str(e)[:80], pd.Timestamp.utcnow(), flush=True)
+                print("CRTS probe failed:", str(e)[:80], pd.Timestamp.now("UTC"), flush=True)
             if time.time() > t_end:
                 sys.exit("CRTS server still down; giving up")
             time.sleep(900)
@@ -134,7 +134,7 @@ def main():
         if len(df):
             df.to_csv(outdir / f"{cid}.csv", index=False)
         rec = dict(cand_id=cid, n_rows=len(df), status=status,
-                   retrieved_utc=pd.Timestamp.utcnow().isoformat(timespec="seconds"),
+                   retrieved_utc=pd.Timestamp.now("UTC").isoformat(timespec="seconds"),
                    seconds=round(time.time() - t0, 1))
         if status == "ok":          # failed queries are retried on the next run
             log = pd.concat([log, pd.DataFrame([rec])], ignore_index=True)

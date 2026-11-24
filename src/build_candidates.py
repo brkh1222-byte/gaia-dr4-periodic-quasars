@@ -63,7 +63,7 @@ COLUMNS = [
     "mag", "mag_band", "period_d", "period_err_d", "period_err_note", "period_frame",
     "period_band", "ref_epoch_mjd", "phase", "amp_mag", "amp_definition",
     "in_final_sample", "group", "arxiv_v1_date", "source_bibcode", "source_doi",
-    "source_arxiv", "source_table", "foustoul2025_status", "flags",
+    "source_arxiv", "source_table", "foustoul2025_status", "elbadry2026_tested", "flags",
 ]
 
 
@@ -376,13 +376,36 @@ def foustoul_status(rows):
             r["foustoul2025_status"] = "verdict not published (58 red-noise/5 unclear/22 no ZTF, unnamed)"
 
 
+def elbadry_status(rows):
+    """Flag rows within 2" of the 181 Gaia DR3 candidates tested by El-Badry, Hogg & Rix 2026
+    (= Huijse et al. arXiv:2505.16884v1 list; GitHub IvS-KULeuven/GASP commit 6085247,
+    results/gasp_only_candidates.csv; saved as data/raw/elbadry2026_candidates.csv)."""
+    f = C.RAW / "elbadry2026_candidates.csv"
+    if not f.exists():
+        for r in rows:
+            r["elbadry2026_tested"] = "not checked"
+        return
+    eb = pd.read_csv(f)
+    ec = SkyCoord(eb["ra_deg"].values, eb["dec_deg"].values, unit="deg")
+    for r in rows:
+        if not np.isfinite(r["ra_deg"]):
+            r["elbadry2026_tested"] = "no position"; continue
+        sep = SkyCoord(r["ra_deg"], r["dec_deg"], unit="deg").separation(ec).arcsec
+        r["elbadry2026_tested"] = (f"yes (Gaia DR3 {eb['source_id'].iloc[int(np.argmin(sep))]})"
+                                   if sep.min() < 2.0 else "no")
+
+
 def main():
     g = graham2015()
     rows = g + charisi2016() + foustoul2025(g) + liu2019() + chen2024()
     foustoul_status(rows)
+    elbadry_status(rows)
     df = pd.DataFrame(rows)
-    df.insert(0, "cand_id", [f"{s[:2].upper()}{i:03d}" for s, i in
+    prefix = {"Graham2015": "G15", "Charisi2016": "C16", "Foustoul2025": "F25",
+              "Liu2019": "L19", "Chen2024": "C24"}
+    df.insert(0, "cand_id", [f"{prefix[s]}_{i:03d}" for s, i in
                              zip(df["sample"], df.groupby("sample").cumcount() + 1)])
+    assert df["cand_id"].is_unique
     extra = [c for c in df.columns if c not in COLUMNS]
     df = df[COLUMNS + extra]
     df.to_csv(C.CANDIDATES_CSV, index=False, float_format="%.7g")

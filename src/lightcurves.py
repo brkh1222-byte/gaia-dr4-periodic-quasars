@@ -5,9 +5,11 @@ Rules
 -----
 CRTS   keep the CRTS MasterID with most epochs whose median position is within 3" of the
        candidate; drop Magerr <= 0.
-PTF    Mould-R (fid=2), goodflag=1 and photcalflag=1; oid with most R epochs.
+PTF    Mould-R (fid=2), goodflag=1; every oid within 2" with >= 20 epochs is kept and given
+       its own mean level (photcalflag not required: mean levels are free).
 ZTF    g band (zg), catflags == 0, magerr > 0; every oid with >= 20 epochs is kept and given
-       its own mean level (one "survey" per oid).
+       its own mean level (one "survey" per oid). The oid with most nights is the reference
+       to which Gaia is linked.
 All    epochs within 0.5 d of each other (same night) are averaged (inverse-variance
        weights); the error of a night is max(formal error, rms/sqrt(n)). Nights more than
        5 robust sigma (1.4826 MAD) from the light-curve median are dropped.
@@ -34,12 +36,12 @@ import config as C  # noqa: E402
 import models as M  # noqa: E402
 
 NIGHT_GAP_D = 0.5
-MIN_ZTF_EPOCHS_PER_OID = 20
+MIN_EPOCHS_PER_OID = 20   # PTF and ZTF: minimum epochs per object ID
 OUTLIER_SIGMA = 5.0
 
 
 def mjd(datestr):
-    return float(Time(datestr).mjd)
+    return float(Time(str(datestr)).mjd)
 
 
 def bin_nights(t, y, e, gap=NIGHT_GAP_D):
@@ -92,18 +94,35 @@ def load_crts(cid, ra, dec):
 
 
 def load_ptf(cid, ra, dec, fid=2):
+    """Returns list of (t, y, e) per PTF oid within 2" with >= MIN_EPOCHS_PER_OID R epochs.
+
+    goodflag = 1 is required; photcalflag is not (absolute calibration is irrelevant because
+    every oid gets its own free mean level).
+    """
     f = C.LC_DIR / "ptf" / f"{cid}.csv"
     if not f.exists():
-        return None
+        return []
     df = pd.read_csv(f)
-    df = df[(df["fid"] == fid) & (df["goodflag"] == 1) & (df["photcalflag"] == 1)
-            & (df["magerr_auto"] > 0)]
-    oid = _nearest_id(df, "oid", "ra", "dec", ra, dec, max_sep=2.0)
-    if oid is None:
-        return None
-    g = df[df["oid"] == oid]
-    t, y, e, _ = bin_nights(g["obsmjd"].values, g["mag_autocorr"].values, g["magerr_auto"].values)
-    return clip_outliers(t, y, e)
+    df = df[(df["fid"] == fid) & (df["goodflag"] == 1) & (df["magerr_auto"] > 0)
+            & np.isfinite(df["mag_autocorr"])]
+    out = []
+    for oid, g in df.groupby("oid"):
+        dra = (np.median(g["ra"]) - ra) * np.cos(np.radians(dec)) * 3600
+        ddec = (np.median(g["dec"]) - dec) * 3600
+        if np.hypot(dra, ddec) > 2.0 or len(g) < MIN_EPOCHS_PER_OID:
+            continue
+        t, y, e, _ = bin_nights(g["obsmjd"].values, g["mag_autocorr"].values, g["magerr_auto"].values)
+        out.append(clip_outliers(t, y, e))
+    return out
+
+
+def _stack(parts):
+    """Combine per-oid (t, y, e) parts into a multi-survey LightCurve (largest part = ref)."""
+    parts = sorted(parts, key=lambda z: -len(z[0]))
+    t = np.concatenate([p[0] for p in parts]); y = np.concatenate([p[1] for p in parts])
+    e = np.concatenate([p[2] for p in parts])
+    sv = np.concatenate([np.full(len(p[0]), k) for k, p in enumerate(parts)])
+    return M.LightCurve(t, y, e, sv)
 
 
 def load_ztf(cid, band="zg"):
@@ -115,7 +134,7 @@ def load_ztf(cid, band="zg"):
     df = df[(df["filtercode"] == band) & (df["catflags"] == 0) & (df["magerr"] > 0)]
     out = []
     for oid, g in df.groupby("oid"):
-        if len(g) < MIN_ZTF_EPOCHS_PER_OID:
+        if len(g) < MIN_EPOCHS_PER_OID:
             continue
         t, y, e, _ = bin_nights(g["mjd"].values, g["mag"].values, g["magerr"].values)
         out.append(clip_outliers(t, y, e))
@@ -138,14 +157,13 @@ def discovery_data(row):
         win = (cutoff, C.GAIA_DR4_END_MJD)
         info.update(survey="CRTS", n_disc=int(m.sum()), n_crts_after_cutoff_unused=int((~m).sum()))
     elif sample == "Charisi2016":
-        lc = load_ptf(cid, ra, dec)
-        if lc is None:
+        parts = [(t[t < cutoff], y[t < cutoff], e[t < cutoff]) for t, y, e in load_ptf(cid, ra, dec)]
+        parts = [p for p in parts if len(p[0]) >= 5]
+        if not parts:
             return None, None, {**info, "reason": "no PTF R light curve"}
-        t, y, e = lc
-        m = t < cutoff
-        L = M.LightCurve(t[m], y[m], e[m])
+        L = _stack(parts)
         win = (cutoff, C.GAIA_DR4_END_MJD)
-        info.update(survey="PTF-R", n_disc=int(m.sum()))
+        info.update(survey="PTF-R", n_disc=len(L.t), n_ptf_oids=len(parts))
     elif sample == "Foustoul2025":
         parts, labels = [], []
         crts = load_crts(cid, ra, dec)
@@ -154,7 +172,7 @@ def discovery_data(row):
             parts.append(crts); t_last_crts = crts[0].max()
         ztf = [z for z in load_ztf(cid, "zg")]
         ztf = [(t[t < cutoff], y[t < cutoff], e[t < cutoff]) for t, y, e in ztf]
-        ztf = [z for z in ztf if len(z[0]) >= MIN_ZTF_EPOCHS_PER_OID]
+        ztf = [z for z in ztf if len(z[0]) >= MIN_EPOCHS_PER_OID]
         if not ztf:
             return None, None, {**info, "reason": "no usable ZTF g light curve"}
         t_first_ztf = min(z[0].min() for z in ztf)
