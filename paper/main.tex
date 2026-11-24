@@ -111,19 +111,26 @@ predictive log Bayes factor
 
 Because both models condition on the actual discovery data, the null distribution of
 $\ln B$ for each candidate is obtained by simulating Gaia data from model D's predictive
-distribution at the real DR4 epochs (1000 draws), which makes the selection of the
-candidates irrelevant to the calibration. Simulating from model S gives the power. A
-candidate is testable if \pending{testability rule as frozen}. An end-to-end simulation of
-DRW ``fake candidates'' selected to look at least as periodic as each real candidate, with
-all hyperparameters refitted, measured the per-candidate false-positive rate
-$r_0=$\pending{value} before release.
+distribution at the real DR4 epochs (1000 draws); the candidate's selection, which depended
+only on the discovery data, is thereby accounted for. Simulating from model S gives the power.
+A candidate is testable if, using the DR4 timestamps and uncertainties only, at least half of
+the model-S simulations reach $p<0.05$.
+
+The plug-in hyperparameters make these $p$-values slightly optimistic. Before release, we
+simulated DRW ``fake candidates'' on each forecast candidate's cadence. Each fake was required
+to look at least as periodic at the published period as the real candidate, had all
+hyperparameters refitted, and was scored exactly as the data. This gave a per-candidate
+false-positive rate $r_0=$\pending{value; 0.061 for the PTF sample} instead of 0.05. A steeper
+(damped harmonic oscillator) red-noise process gave $r_0=0.051$ for the PTF sample.
 
 Decision rules (frozen): (H1) the population shows an excess if the number $k$ of testable
-candidates with null $p<0.05$ has a one-sided binomial probability $<0.01$ under rate
-$\max(0.05,r_0)$; (H2) individual survivors have $\ln B>3$ and Benjamini--Hochberg
-$q<0.05$, and must beat 95\% of 200 phase-scrambled forecasts (H4); (H3) the fraction $f$ of
-true periodic sources is constrained with a mixture of the null and injection $\ln B$
-distributions, and we report its 95\% upper limit.
+forecast candidates with $p<0.05$ has a one-sided binomial probability $<0.01$ under rate
+$\max(0.05,r_0^{95})$, where $r_0^{95}$ is the 95\% upper bound on $r_0$; (H2) survivors have
+$\ln B>3$ and Benjamini--Hochberg $q<0.05$, and are called ephemeris-specific if their $\ln B$
+also exceeds that of 95\% of 200 phase-shifted forecasts (H4); (H3) the fraction $f$ of true
+periodic sources is constrained by a mixture of each candidate's null and injection $\ln B$
+distributions, and we report its 95\% upper limit. A dress rehearsal on mock DR4 data recovered
+$H_0$ when the data were drawn from model D and rejected it when they were drawn from model S.
 
 \section{Results}
 
