@@ -16,3 +16,17 @@ Period marginalisation over the published error (or 5% when none) is a sensitivi
   (simulate_null.py), computed before release: r0_used = max(0.05, 95% upper bound).
 - Positions: catalogue-verified (DR16Q/Milliquas) positions are used for all downloads and
   cross-matches; published positions are kept in the catalogue.
+
+## 2026-11-24 — Sinusoid prior width (Claude; for approval with the pre-registration)
+Fitting sigma_s (prior sd of the sinusoid coefficients) by evidence maximisation drove it to ~0
+for about half of the Charisi candidates. The Occam penalty with 1.5-3 cycles let the DRW absorb
+the sinusoid, i.e. the fit re-decided on the discovery data whether the sinusoid exists. Under
+option A the published sinusoid is taken as given, so sigma_s is fixed at a broad 1 mag and the
+phase and amplitude posterior is set by the discovery data. Effect on Charisi (mock cadence):
+power(p<0.05) >= 0.5 for 29 of 31 instead of ~16 of 31.
+
+## 2026-11-24 — Fake-candidate selection in the null simulation
+A period-window peak search was rejected: with red noise the evidence periodogram rises toward
+long periods, so the maximum sat at the window edge for nearly every fake and for the real
+candidates too. Fakes are now selected by their red-noise-weighted power at the published
+period being at least the real candidate's.
