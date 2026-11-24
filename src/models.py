@@ -23,9 +23,10 @@ fixed at the published value in the primary analysis (researcher's decision, opt
 sensitivity analysis integrates it over a grid of nodes with prior weights from the published
 period and its error, reweighted by the evidence of the discovery data.
 
-Hyperparameters (sigma, tau, extra white noise on the discovery data, and sigma_s for
-model S) are fitted to the discovery data only, by maximum a posteriori with fixed priors
-(config.py), and then frozen.
+Hyperparameters (sigma, tau, extra white noise on the discovery data) are fitted to the
+discovery data only, by maximum a posteriori with fixed priors (config.py), and frozen. The
+sinusoid coefficients have a broad fixed prior (sigma_s = SIN_PRIOR_SIGMA = 1 mag), so their
+posterior (phase and amplitude) is set by the discovery data.
 
 Given frozen hyperparameters, `predict_gaia_logpdf` returns the log predictive density of
 new (Gaia) magnitudes, y_G = mu0 + c + s * [x(t) - mu0] + noise, marginalised over the
@@ -181,23 +182,29 @@ def log_prior_hyper(sigma, tau, jitter, sigma_s=None):
 
 
 def fit_hyper(lc: LightCurve, model: str, period=None, sigma_p=None, n_starts=4,
-              backend="celerite", rng=None) -> Hyper:
+              backend="celerite", rng=None, fit_sigma_s=False) -> Hyper:
     """MAP fit of hyperparameters to the discovery light curve.
 
-    model 'D' fits (sigma, tau, jitter); model 'S' fits (sigma, tau, jitter, sigma_s)
-    with the period fixed at the published value.
+    model 'D' fits (sigma, tau, jitter). Model 'S' fits (sigma, tau, jitter) with the period
+    fixed at the published value and the sinusoid coefficients (a, b) given a broad, fixed
+    prior N(0, SIN_PRIOR_SIGMA^2): the published sinusoid is taken as given and its phase and
+    amplitude are estimated from the discovery data (researcher's option A). Fitting sigma_s
+    by evidence maximisation (fit_sigma_s=True) is NOT used: it applies an Occam penalty that
+    often removes the sinusoid altogether, i.e. it re-decides on the discovery data whether
+    the sinusoid exists, which is the question the Gaia test is meant to answer.
     """
+    fit_ss = (model == "S") and fit_sigma_s
     rng = np.random.default_rng(0) if rng is None else rng
     rms = float(np.std(lc.y))
     lo = [np.log(C.SIGMA_DRW_BOUNDS[0]), np.log(C.TAU_BOUNDS_D[0]), np.log(1e-4)]
     hi = [np.log(C.SIGMA_DRW_BOUNDS[1]), np.log(C.TAU_BOUNDS_D[1]), np.log(C.JITTER_OLD_BOUNDS[1])]
-    if model == "S":
+    if fit_ss:
         lo.append(np.log(1e-3)); hi.append(np.log(2.0))
     bounds = list(zip(lo, hi))
 
     def unpack(p):
         s, tau, j = np.exp(p[:3])
-        ss = np.exp(p[3]) if model == "S" else None
+        ss = (np.exp(p[3]) if fit_ss else C.SIN_PRIOR_SIGMA) if model == "S" else None
         return s, tau, j, ss
 
     def nlp(p):
@@ -212,7 +219,7 @@ def fit_hyper(lc: LightCurve, model: str, period=None, sigma_p=None, n_starts=4,
     best = None
     for k in range(n_starts):
         p0 = [np.log(max(rms, 0.02)), np.log(C.TAU_PRIOR_MEDIAN_D), np.log(0.02)]
-        if model == "S":
+        if fit_ss:
             p0.append(np.log(max(rms, 0.02)))
         p0 = np.array(p0) + (0 if k == 0 else rng.normal(0, 0.7, len(p0)))
         p0 = np.clip(p0, np.array(lo) + 1e-6, np.array(hi) - 1e-6)

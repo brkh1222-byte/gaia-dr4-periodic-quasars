@@ -92,9 +92,10 @@ May 28.
 
 Both models describe the discovery-band magnitude as a Gaussian process. Model D is a DRW
 with covariance $\sigma^2\exp(-|\Delta t|/\tau)$ plus a mean level. Model S adds
-$a\cos(2\pi t/P)+b\sin(2\pi t/P)$ at the published period $P$, with Gaussian priors on
-$a,b$. Hyperparameters ($\sigma,\tau$, an extra white-noise term, and the prior width of
-$a,b$ for model S) are fitted to the discovery data only and frozen. Conditioning on the
+$a\cos(2\pi t/P)+b\sin(2\pi t/P)$ at the published period $P$, with a broad Gaussian prior
+($\sigma_s=1$\,mag) on $a,b$, so that the published sinusoid is taken as given and its phase
+and amplitude are set by the discovery data. Hyperparameters ($\sigma,\tau$ and an extra
+white-noise term) are fitted to the discovery data only and frozen. Conditioning on the
 discovery data gives each model's predictive distribution at the Gaia epochs; in model S
 this carries the posterior phase and amplitude of the sinusoid. Gaia magnitudes are
 modelled as $c+s\,x(t)+\epsilon$. The zero-point offset $c\sim\mathcal{N}(0,1\,\mathrm{mag}^2)$,

@@ -38,6 +38,10 @@ TAU_BOUNDS_D = (5.0, 1.0e4)
 SIGMA_DRW_BOUNDS = (1e-3, 2.0) # DRW rms [mag]
 JITTER_OLD_BOUNDS = (0.0, 0.5) # extra white noise added to discovery-survey errors [mag]
 
+# Sinusoid coefficients a, b ~ N(0, SIN_PRIOR_SIGMA^2): broad and fixed, so the phase and
+# amplitude posterior is determined by the discovery data (option A).
+SIN_PRIOR_SIGMA = 1.0          # [mag]
+
 # Period: PRIMARY analysis fixes P at the published value exactly (researcher's decision,
 # option A). Sensitivity analysis only: marginalise over a uniform grid of nodes spanning
 # +-3 sigma_P with Gaussian prior weights, reweighted by the discovery-data evidence.
