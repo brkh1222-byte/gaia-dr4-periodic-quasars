@@ -1,4 +1,4 @@
-# STATUS — 2026-11-24 (evening)
+# STATUS — 2026-11-25 00:45 local (2026-11-24 16:45 UTC)
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -16,11 +16,19 @@
 - Paper skeleton paper/main.tex + verified refs.bib (no TeX installed locally).
 - PTF light curves for Charisi (50/50).
 
-## Running (background)
-- Gaia DR3 mean G (gaia_source only) -> data/raw/dr3_mean_g.csv
-- ZTF downloads (all 447) -> data/lightcurves/ztf/
-- CRTS: server down since ~09:00 UTC 24 Nov; `get_lightcurves.py crts --wait-hours 96`
-  probes every 15 min and downloads when it returns.
+## Running (background) — restart commands
+- CRTS (intermittent service; empty answers now retried):
+  `nice .venv/bin/python src/get_lightcurves.py crts --samples Graham2015,Charisi2016,Foustoul2025 --wait-hours 100 > data/lightcurves/crts_run.out 2>&1 &`
+  As of 16:45 UTC: 32 Graham, 3 Charisi with CRTS data.
+- ZTF Foustoul (239/257 done):
+  `for k in 0 1 2; do nice .venv/bin/python src/get_lightcurves.py ztf --samples Foustoul2025 --shard $k/3 --wait-hours 24 & done`
+  The other samples' ZTF is exploratory only (not needed for the pre-registration).
+- simulate_null on 31 Charisi templates (K=200), 30/31 done: interim r0 = 0.06 (95% upper bound
+  0.066), false survivors (lnB > 3) 0.55%.
+
+## Design changes today (see notes/decisions.md)
+- sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
+- Charisi mock power: 29/31 have power(p<0.05) >= 0.5.
 
 ## Next
 1. `src/frozen.py` (needs DR3 + light curves) -> results/frozen/*; power on mock cadence.
