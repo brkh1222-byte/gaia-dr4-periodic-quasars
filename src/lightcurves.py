@@ -170,6 +170,11 @@ def discovery_data(row):
         t_last_crts = -np.inf
         if crts is not None and len(crts[0]):
             parts.append(crts); t_last_crts = crts[0].max()
+        used_crts = bool(row["in_final_sample"]) or "CRTSobs=Yes" in str(row["flags"])
+        if used_crts and crts is None:
+            # Foustoul fitted CRTS data for this object: without them the test window cannot
+            # be placed after the data they used, so the object is not scored
+            return None, None, {**info, "reason": "CRTS light curve unavailable (used by Foustoul)"}
         ztf = [z for z in load_ztf(cid, "zg")]
         ztf = [(t[t < cutoff], y[t < cutoff], e[t < cutoff]) for t, y, e in ztf]
         ztf = [z for z in ztf if len(z[0]) >= MIN_EPOCHS_PER_OID]
