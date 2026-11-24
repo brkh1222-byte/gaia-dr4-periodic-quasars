@@ -46,15 +46,72 @@ With only 1.5–3 cycles of data, a random wander often looks like a wave. Searc
 
 ## A.2 Key literature
 
-_(in progress)_
+The story of the field since 2015 is "hundreds of candidates found, then almost all fail when more data arrive". Three threads connect the papers below: candidate searches, retests with longer baselines, and independent physics checks (gravitational waves, Doppler colours). Newest first. Entries marked † were confirmed from search results or other papers' reference lists, not from an opened abstract page. Check them before citing.
+
+| Year | Paper | What it found | How it connects |
+| --- | --- | --- | --- |
+| 2026 | [Huijse et al., A&A 715, A92](https://arxiv.org/abs/2505.16884) | Blind search of 377,128 Gaia DR3 AGN. 13 pass p < 10⁻⁵, matching the false-positive rate; no reliable candidates. | Shows Gaia's ~3-year DR3 baseline is too short. Pipeline "can scale to DR4": the likeliest fast DR4 search. |
+| 2026 | [El-Badry, Hogg & Rix, PASP 138, 024102](https://arxiv.org/abs/2509.10601) | Gaia DR3 sinusoids fail to predict ZTF for all 116 testable objects. Stable sinusoids: ≤ a few per 10⁶ AGN. | Closest in spirit to our test (out-of-sample prediction), but Gaia → ZTF and Gaia-selected only. |
+| 2026 | [Lin, Charisi & Haiman, ApJ 997, 316](https://arxiv.org/abs/2505.14778) | Lomb–Scargle misses most non-sinusoidal (sawtooth) binary signals. | Warns that a sinusoid-only test can miss real binaries. Limits what a negative result means. |
+| 2026 | [Agarwal et al. (NANOGrav), ApJL 998, L11](https://arxiv.org/abs/2508.16534) | Targeted gravitational-wave search of 114 candidate AGN: no individual signal. | Independent physics check; no detection. |
+| 2025 | [Foustoul et al., A&A 699, A55](https://arxiv.org/abs/2505.06656) | CRTS + ZTF (~15 yr): 36 strong and 221 weaker candidates. Of 89 Graham candidates with ZTF, 58 look like red noise and 26 consistent. | Closest check of CRTS ephemerides, but by refitting, not fixed prediction. Also a source of new candidates. |
+| 2025 | [Casey-Clyde et al., ApJ](https://arxiv.org/abs/2405.19406) † | The NANOGrav background limits how many CRTS quasars can host binaries. | Physics prior on how many survivors to expect. |
+| 2024 | [Robnik et al., MNRAS](https://arxiv.org/abs/2407.17565) † | Re-analysis of Charisi's 33 PTF candidates with a better null: none significant. | The PTF sample is already weakened. |
+| 2024 | [Y.-J. Chen et al., MNRAS 527, 12154](https://arxiv.org/abs/2206.11497) | ZTF: 184 → 86 candidates; 3 keep their periodicity with archival data. | ZTF-era candidates; for them Gaia is a retrodiction. |
+| 2024 | [Davis et al., ApJ](https://arxiv.org/abs/2311.10851) † | Periodicity-only selection yields samples dominated by false positives (~60% among luminous quasars). | Sets a low prior. |
+| 2023 | [NANOGrav 15-yr, ApJL 951, L8](https://arxiv.org/abs/2306.16213) | Evidence for a nanohertz gravitational-wave background. | Main motivation: the background is thought to come from SMBHBs. |
+| 2023 | [D'Orazio & Charisi, review](https://arxiv.org/abs/2310.16896) | Standard review of binary signatures. No close binary confirmed. | Best single background read for the student. |
+| 2022 | [Witt et al., ApJ](https://arxiv.org/abs/2110.07465) † | Bayesian periodic + DRW detection for CRTS- and LSST-like data. | Template for our model-comparison approach. |
+| 2022 | [Casey-Clyde et al., ApJ 924, 93](https://arxiv.org/abs/2107.11390) | Binary population model tied to quasars. | Expected numbers. |
+| 2020 | [Zhu & Thrane, ApJ 900, 117](https://arxiv.org/abs/2004.10944) | PG 1302-102: quasi-periodic model slightly beats a sinusoid. | Real binaries may not be strict sinusoids. |
+| 2019 | [Liu et al., ApJ 884, 36](https://arxiv.org/abs/1906.08315) | PS1 MDS: 26 → 1 after extended monitoring. | Shows how candidates decay with longer baselines. |
+| 2018 | [Sesana, Haiman, Kocsis & Kelley, ApJ 856, 42](https://arxiv.org/abs/1703.10611) | If CRTS/PTF candidates were real, the gravitational-wave background would exceed PTA limits. False positives favoured (2.3σ CRTS, 3.6σ PTF). | Independent evidence most candidates are false. |
+| 2018 | [Liu, Gezari & Miller, ApJL](https://arxiv.org/abs/1803.05448) | ASAS-SN extension weakens PG 1302-102's periodicity. | Early extended-baseline test. |
+| 2018 | [Charisi et al., MNRAS 476, 4617](https://arxiv.org/abs/1801.06189) † | At most about a third of candidates fit the Doppler-boost colour test. | Independent physics check. |
+| 2016 | [Vaughan et al., MNRAS 461, 3145](https://arxiv.org/abs/1606.02620) | Red noise readily fakes 2–3 cycles; PG 1302-102 fits red noise. | Origin of the "≥ 5 cycles" rule of thumb. |
+| 2016 | [Charisi et al., MNRAS 463, 2145](https://arxiv.org/abs/1604.01020) | PTF: 33 candidates. | Input catalogue. |
+| 2016 | [Liu et al., ApJ 833, 6](https://arxiv.org/abs/1609.09503) | PS1 MD09: 3 candidates, 0 survive. | Early extended-baseline failure. |
+| 2015 | [Graham et al., MNRAS 453, 1562](https://arxiv.org/abs/1507.07603) | CRTS: 111 candidates from ~243,500 quasars. | Main input catalogue. |
+| 2015 | [Graham et al., Nature](https://arxiv.org/abs/1501.01375) † | PG 1302-102, period ~1884 d. | The famous single candidate. |
+| 2015 | [D'Orazio, Haiman & Schiminovich, Nature](https://arxiv.org/abs/1509.04301) † | Doppler-boost model for PG 1302-102. | Physical basis for a sinusoid. |
+| 2009 | Kelly, Bechtold & Siemiginowska, ApJ 698, 895 | Quasar variability is well described by a damped random walk. | Our null model. |
 
 ## A.3 Open questions and debates
 
-_(in progress)_
+The field agrees that most candidates are red noise. It disagrees on what a real binary's light curve looks like, and therefore on how strict a test should be.
+
+1. **Which red-noise model is the right null?** DRW, power-law, CARMA and newer "learned" null models give different significances ([Vaughan 2016](https://arxiv.org/abs/1606.02620); [Zhu & Thrane 2020](https://arxiv.org/abs/2004.10944); [Sellam et al. 2026](https://arxiv.org/abs/2611.15040)). *For us:* fix the null model and its calibration in advance, and run a sensitivity check with a steeper-spectrum null.
+2. **How many cycles are enough?** The rule of thumb is ≥ 5 ([Vaughan 2016](https://arxiv.org/abs/1606.02620)). DR4's 5.5 years covers only ~1–4 cycles for 500–2000-day periods. *For us:* test whether the predicted phase and amplitude hold, rather than re-detecting a period in Gaia alone.
+3. **Strictly periodic or quasi-periodic?** Real binaries may drift in phase, change amplitude, or have sawtooth shapes ([Zhu & Thrane 2020](https://arxiv.org/abs/2004.10944); [Lin et al. 2026](https://arxiv.org/abs/2505.14778)). *For us:* the allowed phase tolerance must be fixed before the data, or the test cannot fail.
+4. **Do the candidates fit the gravitational-wave background?** The candidate lists imply more binaries than pulsar timing allows ([Sesana et al. 2018](https://arxiv.org/abs/1703.10611); [Casey-Clyde et al. 2025](https://arxiv.org/abs/2405.19406)). The NANOGrav targeted search found nothing ([Agarwal et al. 2026](https://arxiv.org/abs/2508.16534)). *For us:* our upper limit on f feeds straight into this debate.
+5. **Why are stable sinusoids so rare?** Gaia data allow ≤ a few per 10⁶ AGN ([El-Badry et al. 2026](https://arxiv.org/abs/2509.10601)), while population models predict dozens of binaries in Gaia. Either binary light curves are not sinusoidal or binaries are very rare.
+6. **Do Doppler and spectroscopic tests agree?** At most about a third of candidates pass the UV/optical colour test ([Charisi et al. 2018](https://arxiv.org/abs/1801.06189)). Spectroscopic tests of PG 1302-102 are inconclusive.
+7. **Can predictions be trusted after the fact?** Predicted events have failed or been disputed: the OJ 287 outburst expected in Oct 2022 was not seen ([Komossa et al. 2023](https://arxiv.org/abs/2302.11646)). The predicted merger of SDSS J1430+2303 did not occur ([Jiang et al. 2022](https://arxiv.org/abs/2201.11633); [Dotti et al. 2023](https://arxiv.org/abs/2205.06275)). No sample-level pre-registration exists. *For us:* this is the methodological gap we fill.
+8. **Gaia-specific systematics.** Gaia's cadence is sparse and irregular. Scan direction and host-galaxy light affect G-band photometry of extended sources ([Huijse et al. 2026](https://arxiv.org/abs/2505.16884)). *For us:* pre-specify the cross-band calibration and quality cuts.
 
 ## A.4 Is our question still unanswered?
 
-_(in progress)_
+**Yes, as of 24 Nov 2026, but the gap is narrower than PROPOSAL.md says, and two framing problems must be fixed before the pre-registration commit.** We found no paper, and no announced DR4 paper, that tests fixed published ground-survey ephemerides against Gaia photometry, or that pre-registers predictions for a sample of candidates. The search covered arXiv, ADS-indexed journals and ESA's [DR4 papers list](https://www.cosmos.esa.int/web/gaia/dr4-papers). It was web-based and not exhaustive.
+
+**Closest prior work and how we differ.**
+
+| Paper | What it did | How our test differs |
+| --- | --- | --- |
+| [El-Badry, Hogg & Rix 2026](https://arxiv.org/abs/2509.10601) | Asked whether Gaia DR3 sinusoids predict later ZTF data. All 116 failed. | Opposite direction (ground ephemeris → Gaia). Tests published survey catalogues. Pre-registered. |
+| [Foustoul et al. 2025](https://arxiv.org/abs/2505.06656) | Compared 89 Graham candidates with ZTF: 58 red noise, 26 consistent, 5 unclear. | Fixed published ephemerides, not refits. Independent instrument. Fills the 2014–2018 gap. Pre-registered. |
+| [Robnik et al. 2024](https://arxiv.org/abs/2407.17565) | Re-analysed Charisi's 33 PTF candidates: none significant. | New data rather than re-analysis of old data. |
+| [Huijse et al. 2026](https://arxiv.org/abs/2505.16884) | Blind Gaia DR3 search for new periodic AGN. | We test published claims; they search for new ones. They are the group most likely to publish a DR4 search quickly. |
+
+**Framing problem 1: part of the "blind" window is already public.** Gaia DR3 (2022) published epoch photometry for about a million variable-quasar candidates. It covers roughly Jul 2014 to May 2017, about the first 34 months of the DR4 window. Huijse et al. used it. Some of our candidates may already have public Gaia light curves.
+
+- The CRTS and PTF ephemerides (2015–2016) were published before any Gaia quasar light curves existed, so the test of *their* predictions stays out-of-sample.
+- What DR3 threatens is *our* blindness as analysts. The pre-registration must state that nobody on the project has inspected DR3 epoch photometry for any candidate, and must forbid doing so.
+- Add a robustness test that uses only the DR4-new interval (~May 2017 – Jan 2020).
+- The DR3 end date is from secondary sources. Confirm it against the ESA DR3 documentation before committing.
+
+**Framing problem 2: for some catalogues DR4 is not "the future".** Chen 2024 and Foustoul 2025 fitted ZTF data starting in 2018, inside the DR4 window. Liu 2019's follow-up likely ran into 2015–2018. For these the honest phrase is "independent-instrument test of fixed published ephemerides". Each catalogue's group label (forecast or retrodiction) and its usable Gaia epochs must be pre-registered.
+
+**Scoop risk.** ESA's DR4 paper list includes a second variable-AGN catalogue and lensed-quasar time delays, but no periodic-AGN or SMBHB paper. The main external risk is a fast DR4 periodicity search by the Huijse group or the El-Badry/Hogg/Rix group. Neither would test published ephemerides. A dated pre-registration makes priority on the *method* unambiguous even if results land in the same month.
 
 ## A.5 Standard methods, datasets, tools and pitfalls
 
