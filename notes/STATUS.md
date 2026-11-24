@@ -1,4 +1,4 @@
-# STATUS — 2026-11-24 18:00 UTC
+# STATUS — 2026-11-24 ~18:30 UTC
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -45,13 +45,18 @@
 - sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
 - Charisi mock power: 29/31 have power(p<0.05) >= 0.5.
 
-## Next
-1. `src/frozen.py` (needs DR3 + light curves) -> results/frozen/*; power on mock cadence.
-2. `src/simulate_null.py --k 50 --workers 2` on forecast templates -> r0.
-3. Dress rehearsal `src/analyze_dr4.py --mock null` and `--mock signal`.
-4. Choose testability rule (open question), commit code, record hash,
-   `src/make_prereg.py --code-hash <hash> --power-rule <x>`; DO NOT git add preregistration/.
-5. notebooks/make_01_sample.py; finish paper Data/Methods numbers.
+## Next (in order; all resumable)
+1. Let CRTS passes continue (detached; crts_run.out). Graham null sims (2 shards) are running
+   and resume by skipping finished templates.
+2. DR3 code test of release-day scripts: `src/gaia_epochs.py --test-dr3` (3 non-candidate
+   control stars; never candidates) and `src/gaia_xmatch.py --test-dr3` (positions only).
+3. Final freeze ~27-28 Nov: `src/frozen.py` (-> results/frozen), rerun null sims for templates
+   whose conditioning data changed (forecast_alt -> forecast if CRTS arrived), full dress
+   rehearsal `src/analyze_dr4.py --mock null|signal --groups forecast,forecast_alt`,
+   `notebooks/make_01_sample.py`.
+4. Commit code, record hash, `src/make_prereg.py --code-hash <hash> --power-rule 0.5`.
+   DO NOT git add preregistration/ (needs the researcher's OK).
+5. Update notes/prereg_summary.md with the final numbers; final report.
 
 ## Risks
 - CRTS outage: Graham (111) is the largest forecast sample. If CRTS does not return before
