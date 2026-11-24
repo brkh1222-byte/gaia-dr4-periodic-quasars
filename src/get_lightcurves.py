@@ -18,6 +18,8 @@ from __future__ import annotations
 import argparse
 import io
 import re
+import signal
+import socket
 import sys
 import time
 from pathlib import Path
@@ -30,6 +32,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C  # noqa: E402
 
 UA = {"User-Agent": "periodic-quasar-research-script/1.0"}
+socket.setdefaulttimeout(120)
+WATCHDOG_S = 600   # hard limit per object (covers DNS hangs that socket timeouts miss)
+
+
+class _Watchdog(Exception):
+    pass
+
+
+def _alarm(signum, frame):
+    raise _Watchdog("watchdog timeout")
 CRTS_URL = "http://nunuku.caltech.edu/cgi-bin/getcssconedb_release_imgN.cgi"
 ZTF_URL = "https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves"
 IRSA_TAP = "https://irsa.ipac.caltech.edu/TAP"
@@ -153,6 +165,8 @@ def _one_pass(a, cand, outdir, logf, log, done, svc):
         if cid in done:
             continue
         t0 = time.time()
+        signal.signal(signal.SIGALRM, _alarm)
+        signal.alarm(WATCHDOG_S)
         try:
             if a.survey == "crts":
                 nm = r["name"] if not str(r["name"]).startswith("ZTF oid") else None
@@ -162,8 +176,10 @@ def _one_pass(a, cand, outdir, logf, log, done, svc):
             else:
                 df = get_ztf(r["ra_use"], r["dec_use"])
             status = "ok"
-        except Exception as e:
+        except (Exception, _Watchdog) as e:
             df, status = pd.DataFrame(), f"error: {str(e)[:120]}"
+        finally:
+            signal.alarm(0)
         if len(df):
             df.to_csv(outdir / f"{cid}.csv", index=False)
         rec = dict(cand_id=cid, n_rows=len(df), status=status,
