@@ -1,0 +1,17 @@
+# Pinned for reproducibility (Python 3.11, created with uv on 2026-11-24).
+# Install: uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r requirements.txt
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.1.1
+astropy==8.0.3
+astroquery==0.4.11
+pyvo==1.10.0
+celerite2==0.3.3
+matplotlib==3.11.2
+requests==2.34.2
+tqdm==4.70.1
+pytest==9.2.0
+jupyter==1.1.1
+ipykernel==7.4.0
+nbformat==5.11.1
+nbconvert==7.17.2

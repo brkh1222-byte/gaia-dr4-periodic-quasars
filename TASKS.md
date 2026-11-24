@@ -3,7 +3,7 @@
 ⏰ **Hard deadline: Phases 1–2 must be committed and pushed BEFORE Gaia DR4 is released on 2 Dec 2026.** Read PROPOSAL.md and CLAUDE.md first. Tick boxes as tasks complete.
 
 ## Phase 0: Setup
-- [ ] **T0.1** Create `requirements.txt` (numpy, scipy, pandas, astropy, astroquery, celerite2, matplotlib, requests, tqdm) and `src/config.py`.
+- [x] **T0.1** Create `requirements.txt` (numpy, scipy, pandas, astropy, astroquery, celerite2, matplotlib, requests, tqdm) and `src/config.py`. Done with `uv` (Python 3.11, `.venv`), versions pinned.
 
 ## Phase 1: Candidates and pre-Gaia data (before 2 Dec)
 - [ ] **T1.1** Write `data/candidates.csv` with columns: id, RA, Dec, source paper, survey, period (d) ± error, reference epoch/phase, amplitude (mag), band, mean mag, and a flag for whether it is already tested by Foustoul 2025 / El-Badry 2026. Samples:
@@ -25,7 +25,7 @@
   Both are fitted only to pre-2014.5 data (CRTS/PTF). Each produces the predictive mean and covariance at arbitrary times in 2014–2020.
 - [ ] **T2.2** Write `src/score.py`: the log predictive likelihood of new data under each model and the Bayes factor, with pre-specified free nuisance parameters only (Gaia G offset and scale relative to the original band).
 - [ ] **T2.3** Write `src/simulate_null.py`: DRW-simulated fake "candidates" selected with a simple periodogram cut, to calibrate the Bayes factor distribution.
-- [ ] **T2.4 PRE-REGISTRATION.** Write `preregistration/prereg.md` covering the hypotheses, sample cuts, frozen model parameters (`preregistration/frozen_params.csv`), scoring rule, the population test, and the analysis code commit hash. **The student reviews it; commit and push before 2 Dec 2026.** Never edit it afterwards; add dated amendments.
+- [ ] **T2.4 PRE-REGISTRATION.** Write `preregistration/prereg.md` covering the hypotheses, sample cuts, frozen model parameters (`preregistration/frozen_params.csv`), scoring rule, the population test, and the analysis code commit hash. **The researcher reviews it; commit and push before 2 Dec 2026.** Never edit it afterwards; add dated amendments.
 
 ## Phase 3: After DR4 release (2 Dec onwards)
 - [ ] **T3.1** Write `src/gaia_xmatch.py`: a TAP cross-match of candidates to DR4 `source_id` (1″ radius), saving `data/gaia_ids.csv`.
@@ -35,4 +35,4 @@
 - [ ] **T3.5** Figures: Bayes factor distribution vs null; 3–4 example light curves with both predictions overlaid.
 
 ## Phase 4: Write-up
-- [ ] **T4.1** Write `paper/notes.md` with bullet results. **The student writes the paper text personally.** RNAAS template.
+- [ ] **T4.1** Write `paper/notes.md` with bullet results, and fill in Results/Discussion in `paper/main.tex` (RNAAS template). **Claude drafts the paper; the researcher reviews and edits it; the paper carries an AI-use disclosure.** Authorship is undecided: keep the placeholders `[AUTHORS — TBD]` and `[AI-USE STATEMENT — TBD]`.

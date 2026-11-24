@@ -9,3 +9,10 @@ venv/
 *.edf
 *.fits
 *.h5
+!data/candidates.csv
+!data/candidates_README.md
+*.tex.bak
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.pdf
