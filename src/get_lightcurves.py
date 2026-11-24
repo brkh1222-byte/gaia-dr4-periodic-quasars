@@ -94,7 +94,8 @@ def get_crts(ra, dec, name=None, tries=2):
                                                 "OUT": "csv", "SHORT": "short", ".submit": "Submit"})
                 if len(df):
                     df["query"] = f"name:{name}"
-                return df
+                    return df
+                last = RuntimeError("CRTS name search returned no data")
             except Exception as e:
                 last = e
         time.sleep(20)
@@ -132,6 +133,8 @@ def main():
     if a.samples:
         cand = cand[cand["sample"].isin(a.samples.split(","))]
     cand = cand[np.isfinite(cand["ra_use"])]
+    if a.survey == "crts":   # Foustoul C.1 objects flagged CRTSobs=No have no CRTS data
+        cand = cand[~cand["flags"].astype(str).str.contains("CRTSobs=No")]
     k_sh, n_sh = (int(x) for x in a.shard.split("/"))
     cand = cand.iloc[k_sh::n_sh]
     outdir = C.LC_DIR / a.survey
@@ -176,6 +179,11 @@ def _one_pass(a, cand, outdir, logf, log, done, svc):
             else:
                 df = get_ztf(r["ra_use"], r["dec_use"])
             status = "ok"
+            if a.survey == "crts" and len(df) == 0:
+                # every candidate queried for CRTS is expected to have CRTS data (Graham and
+                # Charisi used it; Foustoul objects without CRTS are not queried), so an empty
+                # answer is treated as a service failure and retried in a later pass
+                status = "error: empty CRTS result"
         except (Exception, _Watchdog) as e:
             df, status = pd.DataFrame(), f"error: {str(e)[:120]}"
         finally:
