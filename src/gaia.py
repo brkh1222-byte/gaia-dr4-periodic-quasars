@@ -29,9 +29,9 @@ def dr3_mean_g(cand: pd.DataFrame, radius_arcsec=1.0) -> pd.DataFrame:
     out = []
     for _, r in cand.iterrows():
         q = ("SELECT source_id, ra, dec, phot_g_mean_mag, "
-             f"DISTANCE(POINT({r.ra_deg:.7f},{r.dec_deg:+.7f}), POINT(ra,dec))*3600 AS sep "
+             f"DISTANCE(POINT({r.ra_use:.7f},{r.dec_use:+.7f}), POINT(ra,dec))*3600 AS sep "
              "FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT(ra,dec), "
-             f"CIRCLE({r.ra_deg:.7f},{r.dec_deg:+.7f},{radius_arcsec/3600:.7f})) ORDER BY sep")
+             f"CIRCLE({r.ra_use:.7f},{r.dec_use:+.7f},{radius_arcsec/3600:.7f})) ORDER BY sep")
         for k in range(4):
             try:
                 t = svc.run_sync(q).to_table().to_pandas()

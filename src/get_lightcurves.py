@@ -106,7 +106,7 @@ def main():
     cand = pd.read_csv(C.CANDIDATES_CSV)
     if a.samples:
         cand = cand[cand["sample"].isin(a.samples.split(","))]
-    cand = cand[np.isfinite(cand["ra_deg"])]
+    cand = cand[np.isfinite(cand["ra_use"])]
     outdir = C.LC_DIR / a.survey
     outdir.mkdir(parents=True, exist_ok=True)
     logf = C.LC_DIR / f"{a.survey}_log.csv"
@@ -123,11 +123,11 @@ def main():
         t0 = time.time()
         try:
             if a.survey == "crts":
-                df = get_crts(r["ra_deg"], r["dec_deg"])
+                df = get_crts(r["ra_use"], r["dec_use"])
             elif a.survey == "ptf":
-                df = get_ptf(r["ra_deg"], r["dec_deg"], svc)
+                df = get_ptf(r["ra_use"], r["dec_use"], svc)
             else:
-                df = get_ztf(r["ra_deg"], r["dec_deg"])
+                df = get_ztf(r["ra_use"], r["dec_use"])
             status = "ok"
         except Exception as e:
             df, status = pd.DataFrame(), f"error: {str(e)[:120]}"

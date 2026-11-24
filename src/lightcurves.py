@@ -144,7 +144,7 @@ def load_ztf(cid, band="zg"):
 def discovery_data(row):
     """(LightCurve, test_window(lo, hi), info dict) or (None, None, info) if unusable."""
     sample, cid = row["sample"], row["cand_id"]
-    ra, dec = row["ra_deg"], row["dec_deg"]
+    ra, dec = row["ra_use"], row["dec_use"]
     cutoff = mjd(row["arxiv_v1_date"])
     info = {"cand_id": cid}
     if sample == "Graham2015":

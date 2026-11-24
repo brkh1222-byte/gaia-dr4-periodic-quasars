@@ -6,7 +6,7 @@
 - [x] **T0.1** Create `requirements.txt` (numpy, scipy, pandas, astropy, astroquery, celerite2, matplotlib, requests, tqdm) and `src/config.py`. Done with `uv` (Python 3.11, `.venv`), versions pinned.
 
 ## Phase 1: Candidates and pre-Gaia data (before 2 Dec)
-- [ ] **T1.1** Write `data/candidates.csv` with columns: id, RA, Dec, source paper, survey, period (d) ± error, reference epoch/phase, amplitude (mag), band, mean mag, and a flag for whether it is already tested by Foustoul 2025 / El-Badry 2026. Samples:
+- [x] **T1.1** Write `data/candidates.csv` with columns: id, RA, Dec, source paper, survey, period (d) ± error, reference epoch/phase, amplitude (mag), band, mean mag, and a flag for whether it is already tested by Foustoul 2025 / El-Badry 2026. Samples:
   - Graham+2015 CRTS (111);
   - Charisi+2016 PTF (33);
   - Foustoul+2025 (36 + 221);

@@ -7,6 +7,8 @@ within 5" (25" for identifiers truncated to whole seconds). Results are cached i
 data/raw/position_check.csv and merged into candidates.csv as xm_* columns. Rows whose
 coordinates came only from a truncated identifier get the matched quasar position (flagged).
 A redshift disagreement > 0.05 between the paper and the catalogue is flagged.
+Columns ra_use/dec_use hold the position used downstream (catalogue position when matched,
+otherwise the published one).
 """
 from __future__ import annotations
 
@@ -92,7 +94,12 @@ def main():
             if np.isfinite(r["z"]) and np.isfinite(r["xm_z"]) and abs(r["z"] - r["xm_z"]) > 0.05:
                 fl += f";z_mismatch(paper={r['z']},{r['xm_catalog']}={r['xm_z']})"
         cand.at[i, "flags"] = fl.strip(";")
-    cand.to_csv(C.CANDIDATES_CSV, index=False, float_format="%.7g")
+    # position used for all downloads and cross-matches: the catalogue position when matched
+    m = cand["xm_catalog"].isin(["DR16Q", "Milliquas"])
+    cand["ra_use"] = np.where(m, cand["xm_ra"], cand["ra_deg"])
+    cand["dec_use"] = np.where(m, cand["xm_dec"], cand["dec_deg"])
+    cand["pos_use_source"] = np.where(m, cand["xm_catalog"], "published")
+    cand.to_csv(C.CANDIDATES_CSV, index=False, float_format="%.8g")
     print(cand["xm_catalog"].value_counts(dropna=False))
     print("offset>2\":", cand["flags"].str.contains("catalogue_match_offset").sum(),
           "z mismatch:", cand["flags"].str.contains("z_mismatch").sum(),
