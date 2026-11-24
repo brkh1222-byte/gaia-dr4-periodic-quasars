@@ -38,6 +38,7 @@ import models as M  # noqa: E402
 NIGHT_GAP_D = 0.5
 MIN_EPOCHS_PER_OID = 20   # PTF and ZTF: minimum epochs per object ID
 OUTLIER_SIGMA = 5.0
+MIN_DISC_NIGHTS = 10   # testability is decided by power; this only removes hopeless cases
 
 
 def mjd(datestr):
@@ -194,8 +195,8 @@ def discovery_data(row):
                     n_ztf_oids=len(ztf))
     else:
         return None, None, {**info, "reason": "exploratory sample, not scored"}
-    if L.t.size < 30:
-        return None, None, {**info, "reason": f"fewer than 30 discovery nights ({L.t.size})"}
+    if L.t.size < MIN_DISC_NIGHTS:
+        return None, None, {**info, "reason": f"fewer than {MIN_DISC_NIGHTS} discovery nights ({L.t.size})"}
     if win[1] - win[0] < 180:
         return None, None, {**info, "reason": "test window shorter than 180 d"}
     info.update(t_disc_first=float(L.t.min()), t_disc_last=float(L.t.max()),
