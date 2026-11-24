@@ -1,4 +1,4 @@
-# STATUS — 2026-11-25 00:45 local (2026-11-24 16:45 UTC)
+# STATUS — 2026-11-24 17:00 UTC
 
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
@@ -25,6 +25,12 @@
   The other samples' ZTF is exploratory only (not needed for the pre-registration).
 - simulate_null on 31 Charisi templates (K=200), 30/31 done: interim r0 = 0.06 (95% upper bound
   0.066), false survivors (lnB > 3) 0.55%.
+
+## Results so far
+- Charisi null calibration complete: 6200 fakes, r0 = 0.061 (95% CI 0.055-0.066), lnB>3 0.56%.
+- Dress rehearsal (Charisi, mock DR4): null k=2/30, no survivors; signal H1 rejects, 7/19 pass H4.
+- DHO sensitivity null sim running (k=100): results/null_sim_dho*.csv
+- PTF for Graham (fallback group forecast_alt) downloading.
 
 ## Design changes today (see notes/decisions.md)
 - sigma_s fixed at 1 mag (broad); fake selection = power at the published period.
