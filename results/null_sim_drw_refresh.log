@@ -1,0 +1,5 @@
+4 templates to run, k=200, workers=1
+G15_080: n=200 relaxed=False acc=0.0019 frac(p<0.05)=0.030 frac(lnB>3)=0.000  [47s]
+G15_087: n=200 relaxed=True acc=0.0000 frac(p<0.05)=0.100 frac(lnB>3)=0.040  [86s]
+G15_101: n=200 relaxed=False acc=0.0050 frac(p<0.05)=0.050 frac(lnB>3)=0.005  [138s]
+G15_106: n=200 relaxed=True acc=0.0000 frac(p<0.05)=0.045 frac(lnB>3)=0.010  [181s]

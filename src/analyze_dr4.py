@@ -35,7 +35,7 @@ import lightcurves as LCm  # noqa: E402
 import models as M  # noqa: E402
 import score as S  # noqa: E402
 
-TESTABLE_POWER_P05 = 0.5   # {{POWER_RULE}}: replaced by the value frozen in prereg.md
+TESTABLE_POWER_P05 = 0.5   # frozen testability rule (prereg.md §2; notes/decisions.md)
 
 
 def load_frozen(fp_row):
@@ -153,7 +153,8 @@ def analyse(fp, epoch_dir, outdir, n_sim=1000, groups=("forecast",), seed=C.RAND
                 h4res[cid] = dict(lnB=float(base), frac_scrambled_below=float(np.mean(np.array(scr) < base)),
                                   passes=bool(np.mean(np.array(scr) < base) >= 0.95), lnB_period=per)
         pop["H2"] = dict(n_lnB_gt3=int((T.lnB > C.LNB_THRESHOLD).sum()), n_bh=int(bh.sum()),
-                         survivors=[c for c in surv.cand_id if (not h4) or h4res.get(c, {}).get("passes")],
+                         survivors=list(surv.cand_id),
+                         ephemeris_specific=[c for c in surv.cand_id if h4res.get(c, {}).get("passes")],
                          h4=h4res)
         fpost = S.fraction_posterior(T.lnB.values, [nulls[c] for c in T.cand_id],
                                      [injs[c] for c in T.cand_id])
