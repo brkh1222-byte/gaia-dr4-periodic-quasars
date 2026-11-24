@@ -39,12 +39,16 @@ def main():
     ap.add_argument("--table", default="gaiadr4.gaia_source")
     ap.add_argument("--radius", type=float, default=1.0)
     ap.add_argument("--i-confirm-prereg-is-public", action="store_true")
+    ap.add_argument("--test-dr3", action="store_true",
+                    help="code test against gaiadr3.gaia_source (positions and mean G only)")
     a = ap.parse_args()
-    if not (prereg_is_committed() and a.i_confirm_prereg_is_public):
+    if a.test_dr3:
+        a.table = "gaiadr3.gaia_source"
+    elif not (prereg_is_committed() and a.i_confirm_prereg_is_public):
         sys.exit("Refusing: the pre-registration must be committed and pushed first.")
     import pyvo
     svc = pyvo.dal.TAPService(TAP)
-    fp = pd.read_csv(C.RESULTS / "frozen" / "frozen_params.csv")
+    fp = pd.read_csv(C.RESULTS / ("frozen_provisional" if a.test_dr3 else "frozen") / "frozen_params.csv")
     cand = pd.read_csv(C.CANDIDATES_CSV).set_index("cand_id")
     out = []
     for cid in fp.cand_id:
@@ -65,7 +69,7 @@ def main():
                         sep_arcsec=float(t.sep[0]), n_within=len(t),
                         dr4_g_mean=float(t.phot_g_mean_mag[0])))
         time.sleep(0.2)
-    pd.DataFrame(out).to_csv(C.DATA / "gaia_ids.csv", index=False)
+    pd.DataFrame(out).to_csv(C.DATA / ("gaia_ids_dr3test.csv" if a.test_dr3 else "gaia_ids.csv"), index=False)
     print(pd.DataFrame(out).status.value_counts())
 
 

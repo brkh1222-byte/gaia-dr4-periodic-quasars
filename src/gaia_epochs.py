@@ -17,6 +17,7 @@ import sys
 import time
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -24,18 +25,45 @@ import config as C  # noqa: E402
 from gaia_xmatch import prereg_is_committed  # noqa: E402
 
 
+def control_sources(n=3):
+    """Bright DR3 stars with epoch photometry, each > 60" from every candidate (code test only)."""
+    import numpy as np
+    import pyvo
+    from astropy.coordinates import SkyCoord
+    svc = pyvo.dal.TAPService("https://gea.esac.esa.int/tap-server/tap")
+    t = svc.run_sync("SELECT TOP 20 source_id, ra, dec FROM gaiadr3.gaia_source WHERE "
+                     "1=CONTAINS(POINT(ra, dec), CIRCLE(100.5, 0.0, 1.0)) AND "
+                     "has_epoch_photometry = 'True' AND phot_g_mean_mag < 16").to_table().to_pandas()
+    cand = pd.read_csv(C.CANDIDATES_CSV)
+    cc = SkyCoord(cand.ra_use.values, cand.dec_use.values, unit="deg")
+    keep = [r for _, r in t.iterrows()
+            if SkyCoord(r.ra, r.dec, unit="deg").separation(cc).arcsec.min() > 60]
+    assert len(keep) >= n, "not enough control sources"
+    return pd.DataFrame({"cand_id": [f"CTRL_{int(r.source_id)}" for r in keep[:n]],
+                         "dr4_source_id": [int(r.source_id) for r in keep[:n]]})
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--batch", type=int, default=200)
     ap.add_argument("--data-release", default="Gaia DR4")
     ap.add_argument("--retrieval-type", default="EPOCH_PHOTOMETRY")
+    ap.add_argument("--data-structure", default="DATAMODEL_STANDARD")
     ap.add_argument("--i-confirm-prereg-is-public", action="store_true")
+    ap.add_argument("--test-dr3", action="store_true",
+                    help="code test on 3 NON-candidate DR3 stars (never a candidate)")
     a = ap.parse_args()
-    if not (prereg_is_committed() and a.i_confirm_prereg_is_public):
-        sys.exit("Refusing: the pre-registration must be committed and pushed first.")
     from astroquery.gaia import Gaia
-    ids = pd.read_csv(C.DATA / "gaia_ids.csv").query("status == 'ok'")
-    outdir = C.DATA / "gaia_epochs"; outdir.mkdir(parents=True, exist_ok=True)
+    if a.test_dr3:
+        ids = control_sources()
+        a.data_release = "Gaia DR3"
+        outdir = C.DATA / "gaia_epochs_dr3test"
+    else:
+        if not (prereg_is_committed() and a.i_confirm_prereg_is_public):
+            sys.exit("Refusing: the pre-registration must be committed and pushed first.")
+        ids = pd.read_csv(C.DATA / "gaia_ids.csv").query("status == 'ok'")
+        outdir = C.DATA / "gaia_epochs"
+    outdir.mkdir(parents=True, exist_ok=True)
     todo = ids[[not (outdir / f"{c}.csv").exists() for c in ids.cand_id]]
     sid2cid = dict(zip(todo.dr4_source_id.astype(int), todo.cand_id))
     sids = list(sid2cid)
@@ -45,7 +73,7 @@ def main():
             try:
                 res = Gaia.load_data(ids=chunk, data_release=a.data_release,
                                      retrieval_type=a.retrieval_type, format="csv",
-                                     data_structure="INDIVIDUAL")
+                                     data_structure=a.data_structure)
                 break
             except Exception as e:
                 print("retry", k, str(e)[:100], flush=True); time.sleep(30 * (k + 1))
@@ -61,6 +89,13 @@ def main():
                     df = df[df["band"].astype(str).str.upper() == "G"]
                 df.to_csv(outdir / f"{sid2cid.get(sid, sid)}.csv", index=False)
         print(f"batch {i // a.batch + 1}: {len(chunk)} ids", flush=True)
+    if a.test_dr3:
+        from gaia import clean_dr4_epochs
+        for f in sorted(outdir.glob("*.csv")):
+            d = pd.read_csv(f)
+            t, y, e = clean_dr4_epochs(d)
+            print(f.name, "rows", len(d), "columns", list(d.columns)[:12], "-> visits", len(t),
+                  f"median G {np.median(y):.3f} median err {np.median(e):.4f}" if len(t) else "")
 
 
 if __name__ == "__main__":

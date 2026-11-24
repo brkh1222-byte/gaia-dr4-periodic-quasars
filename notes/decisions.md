@@ -50,6 +50,12 @@ period being at least the real candidate's.
    phase specificity, which a real binary with a poorly constrained discovery phase can fail, so
    making it a gate would mostly lose true signals. Both tiers are reported; neither is called
    a "confirmed binary".
-4. **Commit trailer:** the coordinator asked (2026-11-24) for "Claude Fable 5.2" in the trailers.
-   The commits are made by Claude Opus 5.5, as stated in the harness attribution, so the accurate
-   trailer is kept. Flagged in the report.
+4. **Commit trailer:** commits up to 2026-11-24 ~18:30 UTC carry "Claude Opus 5.5", which was the
+   attribution configured in the harness at the time. From the resume at ~19:00 UTC the harness
+   attribution is "Claude Fable 5.2", and commits use that trailer.
+
+## 2026-11-24 — Gaia archive downtime
+ESA: the Gaia archive is down from 25 Nov 12:00 CET until the DR4 release (2 Dec 12:00 CET).
+DR3 mean G for all candidates was cached on 24 Nov (data/raw/dr3_mean_g.csv). Release-day
+scripts were tested against DR3 on 24 Nov: cross-match 179/179; epoch download + cleaning on
+non-candidate control stars (data_structure must be DATAMODEL_STANDARD; INDIVIDUAL is deprecated).
