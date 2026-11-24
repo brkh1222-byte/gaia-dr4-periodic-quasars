@@ -252,10 +252,12 @@ def period_nodes(period, sigma_p, n=None):
 # ---------------------------------------------------------------------------
 # Gaia nuisance quadrature
 # ---------------------------------------------------------------------------
-def nuisance_nodes():
-    """Quadrature nodes and log-weights for the amplitude ratio s and the Gaia jitter j."""
+def nuisance_nodes(scale_sigma_ln=None):
+    """Quadrature nodes and log-weights for the amplitude ratio s and the Gaia jitter j.
+
+    scale_sigma_ln overrides the log-normal width of s (sensitivity analysis only)."""
     xs, ws = np.polynomial.hermite_e.hermegauss(C.N_SCALE_NODES)
-    s_nodes = np.exp(C.SCALE_PRIOR_SIGMA_LN * xs)
+    s_nodes = np.exp((C.SCALE_PRIOR_SIGMA_LN if scale_sigma_ln is None else scale_sigma_ln) * xs)
     s_logw = np.log(ws / ws.sum())
     # half-normal via the non-negative Gauss-Hermite nodes (odd order includes 0)
     m = 2 * C.N_JITTER_NODES - 1

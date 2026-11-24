@@ -89,7 +89,7 @@ def mock_cadence(g_mag, ecl_lat_deg, rng, t0=C.GAIA_DR4_START_MJD, t1=C.GAIA_DR4
 # ---------------------------------------------------------------------------
 # Frozen DR4 cleaning rules (applied after release)
 # ---------------------------------------------------------------------------
-def clean_dr4_epochs(df: pd.DataFrame, win=(None, None)):
+def clean_dr4_epochs(df: pd.DataFrame, win=(None, None), visit_gap=None):
     """Per-transit G photometry -> visit-binned (t_mjd, mag, err).
 
     Accepted columns (DR3 naming; mapped on release day if DR4 differs, see prereg):
@@ -126,5 +126,9 @@ def clean_dr4_epochs(df: pd.DataFrame, win=(None, None)):
     if len(t) == 0:
         return t, mag, err
     from lightcurves import bin_nights, clip_outliers
-    T, Y, E, _ = bin_nights(t, mag, err, gap=C.VISIT_GAP_D)
+    gap = C.VISIT_GAP_D if visit_gap is None else visit_gap
+    if gap <= 0:   # unbinned sensitivity analysis
+        o = np.argsort(t)
+        return clip_outliers(t[o], mag[o], err[o], nsig=C.GAIA_OUTLIER_SIGMA)
+    T, Y, E, _ = bin_nights(t, mag, err, gap=gap)
     return clip_outliers(T, Y, E, nsig=C.GAIA_OUTLIER_SIGMA)

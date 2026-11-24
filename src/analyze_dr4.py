@@ -69,13 +69,29 @@ def write_mock_epochs(fp, outdir, kind, seed=12345):
         df.to_csv(outdir / f"{p.cand_id}.csv", index=False)
 
 
+SENSITIVITY = {
+    "primary": {},
+    "dr4only": {"dr4_only": True},            # epochs after the end of DR3 (2017-05-28)
+    "unbinned": {"visit_gap": 0.0},           # individual transits, no visit binning
+    "pmarg": {"marginalise_period": True},    # period marginalised over +-3 sigma_P
+    "widescale": {"scale_sigma_ln": 0.7},     # wider G/survey amplitude-ratio prior
+    "shuffle": {"shuffle_periods": True},     # negative control: periods permuted
+}
+
+
 def analyse(fp, epoch_dir, outdir, n_sim=1000, groups=("forecast",), seed=C.RANDOM_SEED,
-            dr4_only=False, h4=True):
+            dr4_only=False, h4=True, visit_gap=None, marginalise_period=False,
+            scale_sigma_ln=None, shuffle_periods=False):
     outdir.mkdir(parents=True, exist_ok=True)
     cand = pd.read_csv(C.CANDIDATES_CSV).merge(pd.read_csv(C.RAW / "dr3_mean_g.csv"), on="cand_id")
     cand = cand.set_index("cand_id")
     rows, nulls, injs = [], {}, {}
-    for _, p in fp[fp.group.isin(groups)].iterrows():
+    fp = fp[fp.group.isin(groups)].copy()
+    if shuffle_periods:   # negative control: each candidate gets another candidate's period
+        perm = np.random.default_rng(seed + 7).permutation(len(fp))
+        fp["period_d"] = fp["period_d"].values[perm]
+        fp["period_err_sensitivity_d"] = fp["period_err_sensitivity_d"].values[perm]
+    for _, p in fp.iterrows():
         rec = dict(cand_id=p.cand_id, sample=p["sample"], group=p.group, period_d=p.period_d)
         f = epoch_dir / f"{p.cand_id}.csv"
         if not f.exists():
@@ -83,12 +99,16 @@ def analyse(fp, epoch_dir, outdir, n_sim=1000, groups=("forecast",), seed=C.RAND
         row = cand.loc[p.cand_id].copy(); row["cand_id"] = p.cand_id
         lc, win, _ = LCm.discovery_data(row)
         lo = max(win[0], C.GAIA_DR3_END_MJD) if dr4_only else win[0]
-        t_g, y_g, e_g = G.clean_dr4_epochs(pd.read_csv(f), (lo, win[1]))
+        t_g, y_g, e_g = G.clean_dr4_epochs(pd.read_csv(f), (lo, win[1]), visit_gap=visit_gap)
         rec["n_visits"] = len(t_g)
         if len(t_g) < 5:
             rows.append({**rec, "status": "fewer than 5 visits"}); continue
         hS, hD = load_frozen(p)
-        sc = S.CandidateScorer(lc, hS, hD, t_g, e_g)
+        if shuffle_periods:   # the S-model hyperparameters are refitted at the swapped period
+            hS = M.fit_hyper(lc, "S", period=p.period_d, sigma_p=p.period_err_sensitivity_d,
+                             rng=np.random.default_rng(F.cid_seed(p.cand_id) + 1))
+        sc = S.CandidateScorer(lc, hS, hD, t_g, e_g, marginalise_period=marginalise_period,
+                               scale_sigma_ln=scale_sigma_ln)
         rng = np.random.default_rng(seed + F.cid_seed(p.cand_id) % 100000)
         # (2) testability: timestamps and errors only
         nul = sc.null_lnB(n_sim, rng)
@@ -150,6 +170,7 @@ def main():
     ap.add_argument("--tag", default="dr4")
     ap.add_argument("--groups", default="forecast")
     ap.add_argument("--dr4-only", action="store_true")
+    ap.add_argument("--sensitivity", default="primary", choices=list(SENSITIVITY))
     a = ap.parse_args()
     fp = pd.read_csv(C.RESULTS / "frozen" / "frozen_params.csv")
     if a.mock:
@@ -158,8 +179,13 @@ def main():
         tag = f"dress_rehearsal_{a.mock}"
     else:
         epoch_dir, tag = C.DATA / "gaia_epochs", a.tag
+    opts = dict(SENSITIVITY[a.sensitivity])
+    if a.dr4_only:
+        opts["dr4_only"] = True
+    if a.sensitivity != "primary":
+        tag = f"{tag}_{a.sensitivity}"
     df, pop = analyse(fp, epoch_dir, C.RESULTS / tag, a.n_sim, tuple(a.groups.split(",")),
-                      dr4_only=a.dr4_only)
+                      h4=(a.sensitivity == "primary"), **opts)
     print(df.groupby(["sample", "status"]).size())
     print(json.dumps(pop, indent=1, default=float)[:3000])
 

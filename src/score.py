@@ -56,12 +56,12 @@ class ModelPredictive:
     """Mixture-of-Gaussians predictive of one model at the Gaia epochs."""
 
     def __init__(self, lc, hyp, t_g, e_g, periods=None, period_logw=None,
-                 phase_rotation=0.0, offset_sigma=None, backend="celerite"):
+                 phase_rotation=0.0, offset_sigma=None, backend="celerite", scale_sigma_ln=None):
         offset_sigma = C.GAIA_OFFSET_PRIOR_SIGMA if offset_sigma is None else offset_sigma
         t_g = np.asarray(t_g, float)
         e2 = np.asarray(e_g, float) ** 2
         n = len(t_g)
-        s_nodes, s_logw, j_nodes, j_logw = M.nuisance_nodes()
+        s_nodes, s_logw, j_nodes, j_logw = M.nuisance_nodes(scale_sigma_ln)
         fac = M.Factor(lc.t, lc.e, hyp.sigma, hyp.tau, hyp.jitter, backend)
         Kno = M.drw_cov(t_g, lc.t, hyp.sigma, hyp.tau)
         KinvKon = fac.solve(Kno.T)
@@ -126,15 +126,18 @@ class CandidateScorer:
     """Both models for one candidate at its Gaia test epochs."""
 
     def __init__(self, lc, hypS, hypD, t_g, e_g, period=None, sigma_p=None,
-                 marginalise_period=False, phase_rotation=0.0, backend="celerite"):
+                 marginalise_period=False, phase_rotation=0.0, backend="celerite",
+                 scale_sigma_ln=None):
         period = hypS.period if period is None else period
         if marginalise_period:
             sp = hypS.sigma_p if sigma_p is None else sigma_p
             Ps, lw = M.period_nodes(period, sp)
         else:
             Ps, lw = np.array([period]), np.array([0.0])
-        self.S = ModelPredictive(lc, hypS, t_g, e_g, Ps, lw, phase_rotation, backend=backend)
-        self.D = ModelPredictive(lc, hypD, t_g, e_g, None, None, backend=backend)
+        self.S = ModelPredictive(lc, hypS, t_g, e_g, Ps, lw, phase_rotation, backend=backend,
+                                 scale_sigma_ln=scale_sigma_ln)
+        self.D = ModelPredictive(lc, hypD, t_g, e_g, None, None, backend=backend,
+                                 scale_sigma_ln=scale_sigma_ln)
 
     def lnB(self, Y):
         return self.S.logpdf(Y) - self.D.logpdf(Y)
