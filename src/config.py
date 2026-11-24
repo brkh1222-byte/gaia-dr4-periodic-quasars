@@ -38,9 +38,11 @@ TAU_BOUNDS_D = (5.0, 1.0e4)
 SIGMA_DRW_BOUNDS = (1e-3, 2.0) # DRW rms [mag]
 JITTER_OLD_BOUNDS = (0.0, 0.5) # extra white noise added to discovery-survey errors [mag]
 
-# Period marginalisation: Gauss-Hermite nodes over N(P_pub, sigma_P^2)
-N_PERIOD_NODES = 7
-SIGMA_P_FRAC_DEFAULT = 0.05    # fractional period error used when none is published
+# Period: PRIMARY analysis fixes P at the published value exactly (researcher's decision,
+# option A). Sensitivity analysis only: marginalise over a uniform grid of nodes spanning
+# +-3 sigma_P with Gaussian prior weights, reweighted by the discovery-data evidence.
+N_PERIOD_NODES = 41
+SIGMA_P_FRAC_DEFAULT = 0.05    # sensitivity only: fractional period error when none is published
 
 # Gaia nuisance parameters (identical in both models)
 GAIA_OFFSET_PRIOR_SIGMA = 1.0  # [mag] Gaussian prior on Gaia-minus-survey zero point (mean 0)

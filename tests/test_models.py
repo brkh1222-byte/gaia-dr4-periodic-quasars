@@ -112,3 +112,58 @@ def test_fit_recovers_drw_parameters():
     y = 18 + M.simulate_drw(t, 0.25, 200.0, rng)[0] + e * rng.standard_normal(400)
     h = M.fit_hyper(M.LightCurve(t, y, e), "D")
     assert 0.15 < h.sigma < 0.4 and 80 < h.tau < 500
+
+
+# ---------------------------------------------------------------------------
+# score.py
+# ---------------------------------------------------------------------------
+import score as S  # noqa: E402
+
+
+def _scorer_setup(seed=7, amp=0.25, n_g=30):
+    rng = np.random.default_rng(seed)
+    t = np.sort(rng.uniform(53500, 56400, 250))
+    e = np.full(250, 0.04)
+    P = 1300.0
+    x = M.simulate_drw(t, 0.15, 200.0, rng)[0] + amp * np.sin(2 * np.pi * t / P + 0.7)
+    lc = M.LightCurve(t, 18 + x + e * rng.standard_normal(250), e)
+    hD = M.fit_hyper(lc, "D")
+    hS = M.fit_hyper(lc, "S", period=P)
+    t_g = np.sort(rng.uniform(57230, 58860, n_g))
+    e_g = np.full(n_g, 0.03)
+    return lc, hS, hD, t_g, e_g, rng
+
+
+def test_scorer_matches_models_module():
+    lc, hS, hD, t_g, e_g, rng = _scorer_setup()
+    sc = S.CandidateScorer(lc, hS, hD, t_g, e_g)
+    y = 18 + 0.1 * rng.standard_normal(len(t_g))
+    ref = M.ln_bayes_factor(lc, hS, hD, t_g, y, e_g)
+    assert np.isclose(sc.lnB(y[None])[0], ref, rtol=1e-8, atol=1e-6)
+
+
+def test_null_and_injection_behave():
+    """Under D, E[lnB] <= 0 (it is minus a KL divergence); under S, E[lnB] >= 0."""
+    lc, hS, hD, t_g, e_g, rng = _scorer_setup()
+    sc = S.CandidateScorer(lc, hS, hD, t_g, e_g)
+    ln0 = sc.null_lnB(3000, rng)
+    ln1 = sc.inj_lnB(3000, rng)
+    assert ln0.mean() < 0 < ln1.mean()
+    # null p-values of null draws are ~uniform
+    ref = sc.null_lnB(3000, rng)
+    p = np.array([S.null_pvalue(v, ref) for v in ln0[:500]])
+    assert abs(np.mean(p < 0.05) - 0.05) < 0.03
+
+
+def test_phase_rotation_zero_is_identity():
+    lc, hS, hD, t_g, e_g, rng = _scorer_setup()
+    a = S.CandidateScorer(lc, hS, hD, t_g, e_g)
+    b = S.CandidateScorer(lc, hS, hD, t_g, e_g, phase_rotation=2 * np.pi)
+    y = a.S.sample(5, rng)
+    assert np.allclose(a.lnB(y), b.lnB(y), atol=1e-6)
+
+
+def test_bh_and_binomial():
+    p = np.array([0.001, 0.008, 0.039, 0.041, 0.042, 0.06, 0.074, 0.205, 0.212, 0.216])
+    assert S.benjamini_hochberg(p, 0.05).sum() == 2
+    assert np.isclose(S.binomial_excess_pvalue(0, 10, 0.05), 1.0)

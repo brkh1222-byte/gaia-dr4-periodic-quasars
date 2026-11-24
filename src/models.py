@@ -19,8 +19,9 @@ N(0, sigma_s^2) each. Conditioning on the discovery light curve therefore gives 
 posterior of the phase and amplitude at the published period P, which is exactly the
 information a published period plus its discovery data carry. (No paper in our sample
 publishes a phase or reference epoch; see notes/catalogue_provenance.md.) The period is
-integrated over a grid of nodes with prior weights from the published period and its
-error; node weights are updated by the evidence of the discovery data.
+fixed at the published value in the primary analysis (researcher's decision, option A); a
+sensitivity analysis integrates it over a grid of nodes with prior weights from the published
+period and its error, reweighted by the evidence of the discovery data.
 
 Hyperparameters (sigma, tau, extra white noise on the discovery data, and sigma_s for
 model S) are fitted to the discovery data only, by maximum a posteriori with fixed priors
@@ -362,13 +363,21 @@ def predictive_logpdf_D(lc, hypD, t_g, y_g, e_g, backend="celerite"):
     return gaia_logpdf_given(cd, y_g, e_g, lc.n_surveys, *nodes)
 
 
-def predictive_logpdf_S(lc, hypS, t_g, y_g, e_g, backend="celerite", return_weights=False):
-    """Mixture over period nodes with weights ∝ prior × evidence of discovery data."""
+def predictive_logpdf_S(lc, hypS, t_g, y_g, e_g, backend="celerite", return_weights=False,
+                        marginalise_period=False):
+    """Model S predictive. Primary analysis: period fixed at the published value.
+
+    With marginalise_period=True (sensitivity analysis): mixture over period nodes with
+    weights proportional to prior x evidence of the discovery data.
+    """
     nodes = nuisance_nodes()
     fac = Factor(lc.t, lc.e, hypS.sigma, hypS.tau, hypS.jitter, backend)
     Kno = drw_cov(np.asarray(t_g, float), lc.t, hypS.sigma, hypS.tau)
     KinvKon = fac.solve(Kno.T)
-    Ps, logw = period_nodes(hypS.period, hypS.sigma_p)
+    if marginalise_period:
+        Ps, logw = period_nodes(hypS.period, hypS.sigma_p)
+    else:
+        Ps, logw = np.array([hypS.period]), np.array([0.0])
     lls, lev = [], []
     for P in Ps:
         cd = condition(lc, hypS, t_g, P, fac=fac, KinvKon=KinvKon)
