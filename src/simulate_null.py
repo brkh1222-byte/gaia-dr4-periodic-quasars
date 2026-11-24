@@ -177,13 +177,19 @@ def main():
     ap.add_argument("--templates", default="")
     ap.add_argument("--psd", default="drw", choices=["drw", "dho"])
     ap.add_argument("--out", default="")
+    ap.add_argument("--shard", default="0/1", help="k/n: run every n-th template (separate processes)")
     a = ap.parse_args()
     import frozen
     ids = a.templates.split(",") if a.templates else frozen.template_ids()
-    out = Path(a.out) if a.out else C.RESULTS / f"null_sim_{a.psd}.csv"
-    done = set(pd.read_csv(out)["template"]) if out.exists() else set()
-    jobs = [(cid, a.k, C.RANDOM_SEED + 7919 * i + (0 if a.psd == "drw" else 1), a.psd)
-            for i, cid in enumerate(ids) if cid not in done]
+    k_sh, n_sh = (int(x) for x in a.shard.split("/"))
+    seeds = {cid: C.RANDOM_SEED + 7919 * i + (0 if a.psd == "drw" else 1) for i, cid in enumerate(ids)}
+    ids = ids[k_sh::n_sh]
+    out = Path(a.out) if a.out else C.RESULTS / (f"null_sim_{a.psd}.csv" if n_sh == 1
+                                                 else f"null_sim_{a.psd}_shard{k_sh}.csv")
+    done = set()
+    for f in C.RESULTS.glob(f"null_sim_{a.psd}*.csv"):
+        done |= set(pd.read_csv(f)["template"])
+    jobs = [(cid, a.k, seeds[cid], a.psd) for cid in ids if cid not in done]
     print(f"{len(jobs)} templates to run, k={a.k}, workers={a.workers}", flush=True)
     t0 = time.time()
     if a.workers > 1:

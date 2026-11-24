@@ -32,8 +32,8 @@ def clopper_pearson_upper(k, n, cl=0.95):
     return 1.0 if k == n else float(beta.ppf(cl, k + 1, n - k))
 
 
-def null_summary(path):
-    d = pd.read_csv(path)
+def null_summary(pattern):
+    d = pd.concat([pd.read_csv(f) for f in sorted(C.RESULTS.glob(pattern))])
     n, k = len(d), int((d.p < C.P_SINGLE).sum())
     return dict(n_fakes=n, n_templates=int(d.template.nunique()),
                 k_per_template=int(d.groupby("template").size().median()),
@@ -55,9 +55,9 @@ def main():
     shutil.copy(C.CANDIDATES_CSV, P / "candidates_snapshot.csv")
     shutil.copy(C.RAW / "dr3_mean_g.csv", P / "dr3_mean_g_snapshot.csv")
 
-    summ = {"drw": null_summary(R / "null_sim_drw.csv")}
-    if (R / "null_sim_dho.csv").exists():
-        summ["dho"] = null_summary(R / "null_sim_dho.csv")
+    summ = {"drw": null_summary("null_sim_drw*.csv")}
+    if list(R.glob("null_sim_dho*.csv")):
+        summ["dho"] = null_summary("null_sim_dho*.csv")
     r0_used = max(C.P_SINGLE, summ["drw"]["r0_upper95"])
     summ["r0_used"] = r0_used
     json.dump(summ, open(P / "null_sim_summary.json", "w"), indent=2)
