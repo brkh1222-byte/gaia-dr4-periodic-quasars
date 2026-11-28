@@ -1,6 +1,9 @@
 % RNAAS research note, AASTeX. Draft written by Claude (AI) for the researcher to review
 % and edit. Results are placeholders until the pre-registered analysis has been run on
 % Gaia DR4 (released 2 Dec 2026). Word limit: 1500 words incl. title, captions, references.
+% LENGTH (28 Nov): ~1500 words of text plus ~400 of references, i.e. ~400 over the RNAAS limit.
+% Either trim (Data and Method are the longest) or submit as a short Letter instead: the
+% researcher's choice.
 % NOTE: the class/option below must be checked against the current AASTeX release
 % (AASTeX v7 is preferred by the AAS; the RNAAS option is documented for v6.3.1).
 \documentclass[RNAAS]{aastex631}
@@ -9,13 +12,14 @@
 
 % ---- numbers filled from the repository (update before submission) ----
 \newcommand{\Ncand}{67}            % candidates in the scored samples
-\newcommand{\Ntest}{[N\_TESTABLE]}        % testable candidates
 \newcommand{\NG}{111}                     % Graham+2015
-\newcommand{\NC}{33}                      % Charisi+2016 final sample
+\newcommand{\NC}{33}
+\newcommand{\NGcrts}{34}                 % Graham candidates conditioned on CRTS data                      % Charisi+2016 final sample
 \newcommand{\NF}{257}                     % Foustoul+2025 (36 + 221)
 \newcommand{\prereghash}{[PREREG\_COMMIT\_HASH]}
 \newcommand{\codehash}{9284e83}
 \newcommand{\pending}[1]{\textbf{[PENDING: #1]}}
+\input{results_macros}
 
 \begin{document}
 
@@ -56,7 +60,9 @@ finding it. Gaia DR4 publishes epoch photometry for all sources from 2014 July 2
 January 20, which fills the gap between CRTS (to $\sim$2013) and ZTF (from 2018). For the
 CRTS and PTF candidates, the DR4 epochs after each paper's submission are genuinely new.
 We fixed every prediction and decision rule before DR4 was released, so that the analysis
-could not be tuned to the outcome.
+could not be tuned to the outcome. A pre-registered forward test of the ZTF candidates of
+\citet{Chen2024} on later ZTF data was posted while this work was in preparation \citep{Wu2026};
+ours is the first test against Gaia and of the CRTS and PTF samples.
 
 \section{Pre-registration and data}
 
@@ -134,21 +140,47 @@ $H_0$ when the data were drawn from model D and rejected it when they were drawn
 
 \section{Results}
 
-\pending{Number of candidates with DR4 counterparts and enough test epochs; number
-testable.}
+% Numbers below come from paper/results_macros.tex, written by paper/fill_results.py from
+% results/dr4/ after the pre-registered analysis has run. Until then the file holds MOCK values
+% from the dress rehearsal and this section must not be read as a result.
+\pending{This section is a template. All numbers are placeholders until DR4 is analysed.}
 
-\pending{Figure 1: distribution of $\ln B$ for testable candidates compared with the stacked
-null and injection distributions (left); posterior on $f$ (right).}
+Of the \Ncand\ scored forecast candidates, \RNscored\ have a DR4 counterpart with at least five
+visits in the test window (median \RMedianVisits\ visits), and \RNtest\ are testable. Among
+these, \RHoneK\ have $p<0.05$, where \RHoneExpected\ are expected under red noise at rate
+\RHoneRate. The binomial probability is \RHoneP, so the population shows \RHoneVerdict\ (H1). The
+median $\ln B$ of testable candidates is \RMedianLnB\ (Figure~\ref{fig:lnb}, left).
+\RNlnBthree\ candidates have $\ln B>3$; \RNsurv\ survive the false-discovery cut (H2), of which
+\RNspecific\ are ephemeris-specific (H4). \pending{Name the survivors, with $\ln B$, $q$ and H4.}
+The fraction of testable candidates whose ephemeris is truly predictive is $f<\RFupper$ at 95\%
+credibility (posterior median \RFmedian; Figure~\ref{fig:lnb}, right).
 
-\pending{H1 count $k$ vs. expected; survivors with $q$ values and H4 outcomes; $f$ upper
-limit; sensitivity analyses (steeper-spectrum null, DR4-only epochs, unbinned data, period
-marginalisation, wider amplitude-ratio prior).}
+\pending{One sentence each: shuffled-period control; DR4-only epochs; unbinned data; period
+marginalisation; wider amplitude prior; the PTF-conditioned Graham group; the Foustoul gap group.
+Deviations from the pre-registration, if any, with the dated amendment.}
+
+\begin{figure}
+\plotone{fig1.pdf}
+\caption{Left: predictive $\ln B$ of the testable candidates (filled), with the stacked
+red-noise null (grey) and the distribution expected if every ephemeris were true (dashed). The
+dotted line marks $\ln B=3$. Right: posterior of the fraction $f$ of truly periodic sources, with
+its 95\% upper limit. \pending{replace mock figure}\label{fig:lnb}}
+\end{figure}
 
 \section{Discussion}
 
-\pending{Comparison with \citet{Foustoul2025} and \citet{ElBadry2026}; implications for the
-binary population and the PTA background \citep{Sesana2018}; limitations: sinusoid-only
-model \citep{Lin2026}, sparse Gaia cadence, filter differences.}
+\pending{To be written after the result. Planned content, whatever the outcome:}
+(i) comparison with the ZTF-based reassessment of \citet{Foustoul2025} and with the Gaia DR3
+$\rightarrow$ ZTF test of \citet{ElBadry2026}, which this test complements by going from ground-based
+ephemerides to Gaia with predictions fixed in advance; (ii) what the limit on $f$ implies for
+the tension between candidate numbers and the gravitational-wave background
+\citep{Sesana2018, NANOGrav2023}; (iii) limitations. The test assumes a strictly periodic
+sinusoid, whereas binary signatures may be non-sinusoidal or drift in phase \citep{Lin2026}, so a
+failed forecast rules out a stable sinusoid, not a binary. Only \NGcrts\ of the \NG\ CRTS
+candidates could be conditioned on CRTS data, because the CRTS light-curve service was largely
+unavailable when the predictions were frozen. The DRW may understate red-noise power on long
+time-scales \citep{Vaughan2016}; the steeper-spectrum calibration addresses this. Gaia's sparse
+cadence limits power for periods longer than the test window.
 
 \begin{acknowledgments}
 This work uses data from the European Space Agency mission Gaia, processed by the Gaia Data
