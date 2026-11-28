@@ -1,5 +1,27 @@
 # STATUS — 2026-11-24 ~19:15 UTC — STOP POINT REACHED (awaiting approval of preregistration/)
 
+## Where this project is (28 Nov 2026, plain language)
+
+**About 60% done overall. Everything that can be done before the Gaia release is done or running;
+the one thing blocking is your approval of the pre-registration.**
+
+- **Finished:** the candidate list (447 objects from 5 papers, every value sourced and checked);
+  the light curves we could get (PTF, ZTF, part of CRTS); the two models and the scoring code
+  (24 automatic tests pass); the red-noise calibration (13,400 simulated fake candidates); a full
+  practice run on fake Gaia data, which gave the right answer in both directions; the scripts
+  that will download the real Gaia data on release day (tested on old Gaia data for stars that
+  are not candidates); a paper draft with Introduction, Data and Methods.
+- **Running:** retries of the Catalina (CRTS) light-curve server, which has been failing for most
+  objects since 24 Nov. Only 38 of the 111 Graham candidates have Catalina data.
+- **Next (before 2 Dec):** refresh the frozen predictions to include 12 more Foustoul objects;
+  repeat the "has anyone done this already?" search; final practice run; polish the paper.
+- **Needs you:** (1) say OK to the pre-registration (one page: notes/prereg_summary.md). It must
+  be public before 2 Dec 12:00 CET or the test is no longer blind. (2) Confirm three choices:
+  the 50%-power testability rule; using PTF data as a separate secondary group for Graham objects
+  without Catalina data; merging the work branch into `main` before the pre-registration commit.
+- **After 2 Dec:** download Gaia DR4 for the candidates, run the frozen analysis (about a day),
+  fill in Results and Discussion, hand you the full draft.
+
 ## Decisions
 - **Researcher, option A:** freeze each published period exactly as printed; phase and
   amplitude from discovery data before each paper's arXiv v1 date (GP posterior); frozen in
