@@ -1,60 +1,58 @@
-# Pre-registration in one page (for the researcher's approval)
+# Pre-registration in one page (needs your OK before 2 Dec 2026, 12:00 CET)
 
-Status: DRAFT awaiting approval. Numbers are from the freeze of 24 Nov 2026 (analysis code commit
-9284e83). If later CRTS retries add Graham objects before approval, the freeze is rerun and these
-numbers updated. Full text: `preregistration/prereg.md`
-(not yet committed). Decisions taken while you were away: `notes/decisions.md`.
+Full text: `preregistration/prereg.md` (assembled, not committed). Freeze of 28 Nov 2026;
+analysis code commit 9284e83. Commands for the moment you say OK: `notes/prereg_commit_commands.md`.
 
-**Question.** Gaia DR4 photometry (Jul 2014 – Jan 2020) was never seen by the authors of the
-candidate catalogues. Does each catalogue's published period, with phase and amplitude worked out
-only from its discovery data, predict that photometry better than red noise does?
+## Three choices to confirm (made by Claude while you were away)
 
-**What is frozen (your option A).** No catalogue published a phase or reference epoch, and
-Graham+2015 and Charisi+2016 published no period errors. So each period is used exactly as
-printed. Phase and amplitude come from the light-curve data taken before the paper's arXiv v1
-date (a Gaussian-process fit with a damped-random-walk noise model and a broad prior on the
-sinusoid). These values, and both models' predicted light curves every 10 days, are frozen in
-`frozen_params.csv` / `frozen_predictions.csv` before DR4 exists.
+1. **Testability rule: at least 50% power.** A candidate counts in the headline test only if,
+   were its sinusoid real, Gaia would give p < 0.05 at least half the time. Alternative: 80%
+   (about a third fewer candidates, same error rate).
+2. **Graham candidates without Catalina (CRTS) data are a separate, secondary group** that uses
+   PTF data instead (41 objects). They are not in the headline test. Alternatives: drop them,
+   or pool them into the headline test.
+3. **Merge the work branch `research-plan` into `main` before the pre-registration commit**, so
+   the timestamped commit sits on the repository's default branch.
 
-**Samples and cuts.**
-- Primary: Graham+2015 CRTS (111) and Charisi+2016 PTF (final 33). Gaia epochs after each paper's
-  arXiv v1 date (27 Jul 2015, 4 Apr 2016). DR3 mean G < 20.7; ≥ 10 discovery nights.
-  67 scored: 34 Graham with CRTS data + 33 Charisi.
-- Secondary, reported separately: Graham objects whose CRTS data could not be retrieved
-  (the CRTS server is intermittent) are conditioned on PTF data instead (41). Foustoul+2025
-  objects are tested in the gap before their ZTF data (73 scored so far, low power: 7 testable).
-  36 Graham objects have neither CRTS nor PTF data yet and cannot be scored.
-- Listed but not scored: Liu+2019 (light curves not public), Chen+2024 (periods not tabulated).
-- Nobody has looked at Gaia DR3 epoch photometry for any candidate. A robustness test uses only
-  DR4 epochs after the DR3 window (after 28 May 2017).
+## What is tested
 
-**Scoring.** For each candidate: ln B = log-probability of the Gaia data under "sinusoid +
-red noise" minus that under "red noise only", both conditioned on the discovery data. The Gaia
-zero point, the Gaia/survey amplitude ratio and extra Gaia noise are free nuisance parameters,
-treated identically in both models. ln B > 0 means the published sinusoid predicted Gaia better.
+Gaia DR4 photometry (Jul 2014 – Jan 2020) was never seen by the authors of the candidate
+catalogues. Does each published period, with phase and amplitude worked out only from the
+discovery data, predict that photometry better than red noise does?
 
-**Per-candidate p-value.** Simulate 1000 Gaia data sets from the red-noise prediction (at the real
-DR4 times) and count how often ln B is at least the observed value.
+**Frozen before DR4 (your option A).** No catalogue published a phase or reference epoch, and
+Graham+2015 and Charisi+2016 gave no period errors. Each period is used exactly as printed.
+Phase and amplitude come only from light-curve data taken before the paper's arXiv v1 date.
+These values and both models' predicted light curves are in `frozen_params.csv` and
+`frozen_predictions.csv`.
 
-**Testable.** At least 50% power, i.e. if the sinusoid were real, p < 0.05 in at least half of the
-simulations, computed from DR4 times and errors only. 60 of 67 primary candidates on a mock cadence (37 of 41 in the PTF-fallback group).
+**Samples.** Headline: 67 candidates = 34 Graham+2015 (with CRTS data) + 33 Charisi+2016 (PTF),
+all with Gaia G < 20.7 and at least 10 discovery nights; Gaia epochs after 27 Jul 2015 / 4 Apr
+2016. Secondary: 41 Graham via PTF; 85 Foustoul+2025 in the gap before their ZTF data (low
+power). Not scorable: 31 Graham objects with neither CRTS nor PTF data (the CRTS server has been
+failing since 24 Nov), 5 with too few nights, and 158 Foustoul objects whose CRTS data could not
+be retrieved; Liu+2019 and Chen+2024 (data or periods not public).
+Nobody has looked at Gaia DR3 light curves of any candidate.
 
-**Population test (H1, the headline).** k = number of testable primary candidates with p < 0.05.
-"Excess" if a binomial test against rate r0 gives P < 0.01. r0 is measured before release
-by simulating red-noise "fake candidates" that look as periodic as the real ones and running
-the whole pipeline: r0 = 0.056 (13,400 fakes on the 67 primary templates; 95% upper bound 0.0596, which is
-the rate used). For 10 strongly periodic Graham templates no fake matched in 200,000 trials, so
-the 200 most periodic fakes were used (flagged "relaxed").
+**Score.** ln B = how much better "sinusoid + red noise" predicts the Gaia points than "red
+noise only", both conditioned on the discovery data. The Gaia zero point, amplitude ratio and
+extra noise are free and treated identically in both models.
 
-**Individual candidates (H2/H4).** Survivor: ln B > 3 and Benjamini–Hochberg q < 0.05.
-"Ephemeris-specific" if it also beats 95% of 200 phase-shifted forecasts. Never called "confirmed".
+**Per-candidate p-value.** 1000 simulated Gaia data sets from the red-noise prediction at the
+real DR4 times; p = fraction with ln B at least as large as observed.
 
-**Fraction (H3).** Posterior on the fraction f of true periodic sources; report the 95% upper limit.
+**Headline test (H1).** Count candidates with p < 0.05 among the testable ones (60 of 67 on a
+mock cadence). Excess if a binomial test gives P < 0.01 against a false-positive rate of 0.0596.
+That rate was measured before release with 13,400 red-noise fake candidates run through the
+whole pipeline (measured 0.056; 95% upper bound used).
 
-**Controls and sensitivity (not headline).** Shuffled periods (should give ~n·r0); DR4-only
-epochs; unbinned Gaia transits; period marginalised over its error (5% if none); wider amplitude
-ratio prior; steeper-spectrum (DHO) red noise (r0 = 0.051 for PTF).
+**Individual candidates.** Survivor: ln B > 3 and Benjamini–Hochberg q < 0.05. "Ephemeris-specific"
+if it also beats 95% of 200 phase-shifted forecasts. Never called "confirmed binary".
 
-**Dress rehearsal (mock DR4, 67 primary candidates, 62 testable).** With red-noise data: k = 3
-(3.1 expected), no survivors, f < 0.05. With every ephemeris true: H1 rejected, 38 survivors (16
-ephemeris-specific), f ≈ 0.94. Shuffled-period control on red-noise data: k = 2 of 45.
+**Fraction.** 95% upper limit on the fraction f of candidates that are truly periodic.
+
+**Checks reported alongside.** Shuffled periods; only epochs after the DR3 window; unbinned
+Gaia data; period uncertainty included; wider amplitude prior; steeper red-noise spectrum.
+
+**Practice run on fake Gaia data.** Red-noise data: 3 of 62 below p = 0.05 (3.1 expected), no
+survivors, f < 0.05. All ephemerides true: excess detected, 38 survivors, f ≈ 0.94.

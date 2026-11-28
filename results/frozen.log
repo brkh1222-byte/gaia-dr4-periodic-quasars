@@ -106,6 +106,17 @@ C16_047 SDSS J232135.73+173916.5     G=19.41 n=50 sig_s=1.000 A=0.304±0.108 dln
 C16_048 2QZ J235800.2-281429         G=19.75 n=27 sig_s=1.000 A=0.201±0.057 dlnZ=-2.53 pow=1.00
 C16_049 SDSS J235928.99+170426.9     G=20.14 n=52 sig_s=1.000 A=0.037±0.061 dlnZ=-5.06 pow=0.58
 C16_050 SDSS J235958.72+003345.3     G=19.32 n=17 sig_s=1.000 A=0.100±0.129 dlnZ=-4.91 pow=0.91
+F25_005 J092911+203708               G=18.59 n=303 sig_s=1.000 A=0.074±0.037 dlnZ=-4.70 pow=0.13
+F25_012 J082716+490534               G=19.05 n=561 sig_s=1.000 A=0.325±0.093 dlnZ=+1.05 pow=0.38
+F25_015 J104941+085548               G=17.88 n=320 sig_s=1.000 A=0.091±0.017 dlnZ=+4.25 pow=0.31
+F25_017 UM211                        G=17.39 n=387 sig_s=1.000 A=0.077±0.019 dlnZ=-0.59 pow=0.50
+F25_021 J082926+180020               G=19.92 n=626 sig_s=1.000 A=0.103±0.054 dlnZ=-4.03 pow=0.09
+F25_022 J083349+232809               G=17.46 n=350 sig_s=1.000 A=0.062±0.023 dlnZ=-4.00 pow=0.16
+F25_023 J134855-032141               G=17.17 n=260 sig_s=1.000 A=0.062±0.022 dlnZ=-3.71 pow=0.15
+F25_024 J102255+172155               G=18.63 n=618 sig_s=1.000 A=0.055±0.028 dlnZ=-5.19 pow=0.14
+F25_025 UM234                        G=18.17 n=432 sig_s=1.000 A=0.071±0.041 dlnZ=-4.88 pow=0.11
+F25_034 PKS 0157+011                 G=17.90 n=456 sig_s=1.000 A=0.067±0.023 dlnZ=-3.25 pow=0.46
+F25_035 J043526-164346               G=17.67 n=639 sig_s=1.000 A=0.035±0.052 dlnZ=-5.83 pow=0.15
 F25_037 ZTF oid 722214100002451      G=18.52 n=1561 sig_s=1.000 A=0.117±0.040 dlnZ=-2.15 pow=0.46
 F25_039 ZTF oid 796215300002648      G=18.37 n=1026 sig_s=1.000 A=0.011±0.021 dlnZ=-7.59 pow=0.13
 F25_042 ZTF oid 792206200005745      G=18.94 n=558 sig_s=1.000 A=0.053±0.061 dlnZ=-5.29 pow=0.27
@@ -164,6 +175,7 @@ F25_207 ZTF oid 817205100002706      G=19.33 n=458 sig_s=1.000 A=0.160±0.038 dl
 F25_216 ZTF oid 626115400010235      G=18.75 n=321 sig_s=1.000 A=0.036±0.025 dlnZ=-6.40 pow=0.29
 F25_218 ZTF oid 631215300002368      G=19.48 n=392 sig_s=1.000 A=0.037±0.037 dlnZ=-6.19 pow=0.22
 F25_219 ZTF oid 668202200002341      G=19.38 n=388 sig_s=1.000 A=0.054±0.063 dlnZ=-5.23 pow=0.21
+F25_221 ZTF oid 669203300007075      G=19.82 n=388 sig_s=1.000 A=0.084±0.032 dlnZ=-3.69 pow=0.29
 F25_222 ZTF oid 671112100001875      G=20.14 n=507 sig_s=1.000 A=0.247±0.073 dlnZ=-0.72 pow=0.65
 F25_223 ZTF oid 672204400000878      G=20.02 n=372 sig_s=1.000 A=0.079±0.057 dlnZ=-4.87 pow=0.29
 F25_229 ZTF oid 716201200001836      G=20.05 n=389 sig_s=1.000 A=0.048±0.091 dlnZ=-4.64 pow=0.18
@@ -183,7 +195,7 @@ sample        status
 Charisi2016   not scored (not in Charisi final 33)                17
               scored                                              33
 Chen2024      not scored (exploratory sample)                      3
-Foustoul2025  CRTS light curve unavailable (used by Foustoul)    170
+Foustoul2025  CRTS light curve unavailable (used by Foustoul)    158
               G cut (DR3 mean G = 20.711626052856445)              1
               G cut (DR3 mean G = 20.72633934020996)               1
               G cut (DR3 mean G = 20.737625122070312)              1
@@ -196,7 +208,7 @@ Foustoul2025  CRTS light curve unavailable (used by Foustoul)    170
               G cut (DR3 mean G = 21.531156539916992)              1
               G cut (DR3 mean G = 21.56033706665039)               1
               G cut (DR3 mean G = nan)                             3
-              scored                                              73
+              scored                                              85
 Graham2015    fewer than 10 discovery nights (4)                   1
               fewer than 10 discovery nights (6)                   1
               fewer than 10 discovery nights (7)                   1

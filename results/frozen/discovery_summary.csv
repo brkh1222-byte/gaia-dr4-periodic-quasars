@@ -164,27 +164,27 @@ F25_001,Foustoul2025,gap,J141425+171811,19.733074188232422,CRTS light curve unav
 F25_002,Foustoul2025,gap,QNZ3:54,18.71769142150879,CRTS light curve unavailable (used by Foustoul),,
 F25_003,Foustoul2025,gap,J133654+171040,18.444704055786133,CRTS light curve unavailable (used by Foustoul),,
 F25_004,Foustoul2025,gap,J122616+504205,19.325191497802734,CRTS light curve unavailable (used by Foustoul),,
-F25_005,Foustoul2025,gap,J092911+203708,18.59406089782715,CRTS light curve unavailable (used by Foustoul),,
+F25_005,Foustoul2025,gap,J092911+203708,18.59406089782715,scored,303.0,723.0579724588097
 F25_006,Foustoul2025,gap,J152157+181018,18.403430938720703,CRTS light curve unavailable (used by Foustoul),,
 F25_007,Foustoul2025,gap,J133807+360220,18.62693214416504,CRTS light curve unavailable (used by Foustoul),,
 F25_008,Foustoul2025,gap,J114857+160023,18.275400161743164,CRTS light curve unavailable (used by Foustoul),,
 F25_009,Foustoul2025,gap,J130040+172758,20.378368377685547,CRTS light curve unavailable (used by Foustoul),,
 F25_010,Foustoul2025,gap,J131626+390752,19.484209060668945,CRTS light curve unavailable (used by Foustoul),,
 F25_011,Foustoul2025,gap,J124838+364453,19.422672271728516,CRTS light curve unavailable (used by Foustoul),,
-F25_012,Foustoul2025,gap,J082716+490534,19.048124313354492,CRTS light curve unavailable (used by Foustoul),,
+F25_012,Foustoul2025,gap,J082716+490534,19.048124313354492,scored,561.0,739.0944599464929
 F25_013,Foustoul2025,gap,J172656+600348,18.559085845947266,CRTS light curve unavailable (used by Foustoul),,
 F25_014,Foustoul2025,gap,J160730+144904,17.638399124145508,CRTS light curve unavailable (used by Foustoul),,
-F25_015,Foustoul2025,gap,J104941+085548,17.8810977935791,CRTS light curve unavailable (used by Foustoul),,
+F25_015,Foustoul2025,gap,J104941+085548,17.8810977935791,scored,320.0,740.069692042096
 F25_016,Foustoul2025,gap,J131909+090814,18.396326065063477,CRTS light curve unavailable (used by Foustoul),,
-F25_017,Foustoul2025,gap,UM211,17.388349533081055,CRTS light curve unavailable (used by Foustoul),,
+F25_017,Foustoul2025,gap,UM211,17.388349533081055,scored,387.0,1417.4460301
 F25_018,Foustoul2025,gap,J121457+132024,18.998828887939453,CRTS light curve unavailable (used by Foustoul),,
 F25_019,Foustoul2025,gap,J091501+460937,19.6075496673584,CRTS light curve unavailable (used by Foustoul),,
 F25_020,Foustoul2025,gap,J115445+244646,18.974990844726562,CRTS light curve unavailable (used by Foustoul),,
-F25_021,Foustoul2025,gap,J082926+180020,19.917924880981445,CRTS light curve unavailable (used by Foustoul),,
-F25_022,Foustoul2025,gap,J083349+232809,17.45523452758789,CRTS light curve unavailable (used by Foustoul),,
-F25_023,Foustoul2025,gap,J134855-032141,17.17351531982422,CRTS light curve unavailable (used by Foustoul),,
-F25_024,Foustoul2025,gap,J102255+172155,18.627775192260742,CRTS light curve unavailable (used by Foustoul),,
-F25_025,Foustoul2025,gap,UM234,18.173791885375977,CRTS light curve unavailable (used by Foustoul),,
+F25_021,Foustoul2025,gap,J082926+180020,19.917924880981445,scored,626.0,682.0314347908134
+F25_022,Foustoul2025,gap,J083349+232809,17.45523452758789,scored,350.0,746.0452943086493
+F25_023,Foustoul2025,gap,J134855-032141,17.17351531982422,scored,260.0,712.0613421303933
+F25_024,Foustoul2025,gap,J102255+172155,18.627775192260742,scored,618.0,793.9434053059886
+F25_025,Foustoul2025,gap,UM234,18.173791885375977,scored,432.0,913.3384750000041
 F25_026,Foustoul2025,gap,J155449+084204,17.15093421936035,CRTS light curve unavailable (used by Foustoul),,
 F25_027,Foustoul2025,gap,J081133+065558,18.98141098022461,CRTS light curve unavailable (used by Foustoul),,
 F25_028,Foustoul2025,gap,J100641+253110,19.223346710205078,CRTS light curve unavailable (used by Foustoul),,
@@ -193,8 +193,8 @@ F25_030,Foustoul2025,gap,J155647+181531,18.978660583496094,CRTS light curve unav
 F25_031,Foustoul2025,gap,J123527+392824,18.84239387512207,CRTS light curve unavailable (used by Foustoul),,
 F25_032,Foustoul2025,gap,J113142+304139,19.493213653564453,CRTS light curve unavailable (used by Foustoul),,
 F25_033,Foustoul2025,gap,J102625+295907,19.274980545043945,CRTS light curve unavailable (used by Foustoul),,
-F25_034,Foustoul2025,gap,PKS 0157+011,17.90314483642578,CRTS light curve unavailable (used by Foustoul),,
-F25_035,Foustoul2025,gap,J043526-164346,17.670894622802734,CRTS light curve unavailable (used by Foustoul),,
+F25_034,Foustoul2025,gap,PKS 0157+011,17.90314483642578,scored,456.0,1438.4818056000004
+F25_035,Foustoul2025,gap,J043526-164346,17.670894622802734,scored,639.0,1481.4823147999923
 F25_036,Foustoul2025,gap,J122728+322508,19.139999389648438,CRTS light curve unavailable (used by Foustoul),,
 F25_037,Foustoul2025,gap,ZTF oid 722214100002451,18.523130416870117,scored,1561.0,1340.3979304837048
 F25_038,Foustoul2025,gap,ZTF oid 762207400010289,18.814786911010742,CRTS light curve unavailable (used by Foustoul),,
@@ -380,7 +380,7 @@ F25_217,Foustoul2025,gap,ZTF oid 629208200004301,,G cut (DR3 mean G = nan),,
 F25_218,Foustoul2025,gap,ZTF oid 631215300002368,19.478572845458984,scored,392.0,1339.2565740999999
 F25_219,Foustoul2025,gap,ZTF oid 668202200002341,19.38168716430664,scored,388.0,1339.2565740999999
 F25_220,Foustoul2025,gap,ZTF oid 668206200002402,19.150102615356445,CRTS light curve unavailable (used by Foustoul),,
-F25_221,Foustoul2025,gap,ZTF oid 669203300007075,19.823020935058594,CRTS light curve unavailable (used by Foustoul),,
+F25_221,Foustoul2025,gap,ZTF oid 669203300007075,19.823020935058594,scored,388.0,743.0008647774666
 F25_222,Foustoul2025,gap,ZTF oid 671112100001875,20.135160446166992,scored,507.0,1339.3318749999962
 F25_223,Foustoul2025,gap,ZTF oid 672204400000878,20.017404556274414,scored,372.0,1339.315644788614
 F25_224,Foustoul2025,gap,ZTF oid 672206200010804,19.67999839782715,CRTS light curve unavailable (used by Foustoul),,
